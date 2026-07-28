@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <script src="auth.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Utama - RANGER+ Monitoring System</title>
+    <!-- Memanggil CSS Global -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="layout-container">
+        <!-- SIDEBAR NAVIGATION (OTOMATIS DIISI OLEH SIDEBARV2.JS) -->
+        <div class="sidebar"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-content">
+            <div class="wrapper">
+                <!-- HERO BANNER -->
+                <div class="hero-banner">
+                    <div class="hero-text">
+                        <h1>LAPORAN QRIS</h1>
+                        <p class="hero-subtitle" id="quote-text">Memuat kutipan...</p>
+                        <button id="refreshQuoteBtn" class="refresh-quote-btn" type="button">⟳</button>
+                    </div>
+                    <div class="hero-logo-box">
+                        <img src="assets/logo-ranger.png" alt="Logo RANGER+">
+                    </div>
+                </div>
+
+                <!-- INFO STATUS BAR -->
+                <div class="info-bar">
+                    <div class="info-card">
+                        <span class="info-label">Status Sistem</span>
+                        <div class="info-value">
+                            <span class="status-dot"></span> Online & Sinkron
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">Waktu Realtime</span>
+                        <div class="info-value" id="realtimeClock">-</div>
+                    </div>
+                </div>
+
+                <!-- SECTION TITLE & MODULES -->
+                <div class="section-heading">Modul Pilihan Crosscheck</div>
+                <div class="modules-grid">
+                    <a href="qrismalam.html" class="module-card">
+                        <div>
+                            <h3>Monitoring QRIS Malam</h3>
+                            <p>Pemantauan realtime dan crosscheck transaksi QRIS Cpanel SC vs WP pada jam cut-off malam hari.</p>
+                        </div>
+                        <div class="module-link">Buka Modul →</div>
+                    </a>
+                    <a href="qrisperiodik.html" class="module-card">
+                        <div>
+                            <h3>Crosscheck QRIS Periodik</h3>
+                            <p>Pemantauan dan crosscheck data transaksi QRIS pada hari yang sama secara instan.</p>
+                        </div>
+                        <div class="module-link">Buka Modul →</div>
+                    </a>
+                    <a href="qriscb.html" class="module-card">
+                        <div>
+                            <h3>Crosscheck QRIS H+1 Crossborder</h3>
+                            <p>Analisis mendalam volume dan nominal transaksi QRIS Cross Border pada siklus H+1.</p>
+                        </div>
+                        <div class="module-link">Buka Modul →</div>
+                    </a>
+                    <a href="qrisdomestik.html" class="module-card">
+                        <div>
+                            <h3>Crosscheck QRIS H+1 Domestik</h3>
+                            <p>Rekapitulasi lintas data recon, transaksi, dan settlement domestik secara terstruktur.</p>
+                        </div>
+                        <div class="module-link">Buka Modul →</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="sidebarv2.js"></script>
+    <script src="quote.js"></script>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            let dateStr = now.toLocaleDateString('id-ID', options);
+            let timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            
+            const clockEl = document.getElementById('realtimeClock');
+            if (clockEl) {
+                clockEl.innerText = `${dateStr} - ${timeStr}`;
+            }
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>

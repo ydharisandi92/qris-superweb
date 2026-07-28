@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RANGER+ Monitoring System</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body, html {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-app);
+        }
+        .login-card {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-bottom: 4px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .login-card img {
+            height: 50px;
+            margin-bottom: 16px;
+            filter: brightness(0) invert(1);
+        }
+        .login-card h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+        .login-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0 0 16px 0;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            text-transform: uppercase; /* Visual kapital di input */
+        }
+        .form-group input:focus {
+            border-color: #3b82f6;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #1565c0;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .btn-login:hover {
+            background: #1e88e5;
+        }
+        .btn-login:disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+        .error-msg {
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* STYLES BARU: KONTROL STATUS SERVER & REFRESH */
+        .server-status-box {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-color, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ef4444; /* Default Merah (Offline) */
+            display: inline-block;
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+            transition: all 0.3s ease;
+        }
+        .status-dot.online {
+            background-color: #22c55e; /* Hijau (Online) */
+            box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
+        }
+        .btn-refresh-server {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color, #334155);
+            color: #94a3b8;
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn-refresh-server:hover {
+            background: #334155;
+            color: #ffffff;
+            border-color: #475569;
+        }
+        .spin {
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>HOHO HIHE</h2>
+        <p>Silahkan login dengan akun anda</p>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username PIC</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Masukkan username..." 
+                    required 
+                    autocomplete="off"
+                    oninput="this.value = this.value.toUpperCase()"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Masukkan password..." required>
+            </div>
+
+            <button type="submit" class="btn-login" id="btnLogin">MASUK SEKARANG 🚀</button>
+            <div id="errorMsg" class="error-msg">Username atau Password salah!</div>
+        </form>
+
+        <!-- SEKSI STATUS SERVER & TOMBOL REFRESH -->
+        <div class="server-status-box">
+            <div class="status-info">
+                <span id="statusDot" class="status-dot"></span>
+                <span id="statusText" style="color: #94a3b8;">Mengecek Server...</span>
+            </div>
+            <button type="button" id="btnRefreshServer" class="btn-refresh-server" onclick="checkServerStatus()" title="Cek ulang koneksi server">
+                ⟳
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // URL SERVER BACKEND DI LAPTOP KAMU
+        const SERVER_URL = "http://localhost:5000"; // Sesuaikan IP/Port backend laptopmu (misal Python Flask/FastAPI)
+
+        // 1. FUNGSI CEK KONEKSI SERVER
+        async function checkServerStatus() {
+            const dot = document.getElementById("statusDot");
+            const text = document.getElementById("statusText");
+            const btn = document.getElementById("btnRefreshServer");
+
+            btn.classList.add("spin");
+            text.innerText = "Mengecek...";
+            text.style.color = "#94a3b8";
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000); // Timeout 3 detik
+
+                const res = await fetch(`${SERVER_URL}/api/status`, {
+                    method: "GET",
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    dot.className = "status-dot online";
+                    text.innerText = "Server Online 🟢";
+                    text.style.color = "#22c55e";
+                } else {
+                    throw new Error("Server Error");
+                }
+            } catch (err) {
+                dot.className = "status-dot";
+                text.innerText = "Server Offline 🔴";
+                text.style.color = "#ef4444";
+            } finally {
+                btn.classList.remove("spin");
+            }
+        }
+
+        // 2. FUNGSI HANDLE LOGIN VIA API SERVER LOKAL
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const user = document.getElementById("username").value.trim().toUpperCase();
+            const pass = document.getElementById("password").value;
+            const errorMsg = document.getElementById("errorMsg");
+            const btnLogin = document.getElementById("btnLogin");
+
+            errorMsg.style.display = "none";
+            btnLogin.innerText = "MEMPROSES...";
+            btnLogin.disabled = true;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    sessionStorage.setItem("loggedInUser", user);
+                    window.location.href = "index.html";
+                } else {
+                    errorMsg.innerText = data.message || "Username atau Password salah!";
+                    errorMsg.style.display = "block";
+                }
+            } catch (err) {
+                errorMsg.innerText = "Gagal terhubung ke Server Laptop!";
+                errorMsg.style.display = "block";
+            } finally {
+                btnLogin.innerText = "MASUK SEKARANG 🚀";
+                btnLogin.disabled = false;
+            }
+        }
+
+        // Panggil status server & cek session saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            checkServerStatus();
+
+            if (sessionStorage.getItem("loggedInUser")) {
+                window.location.href = "index.html";
+            }
+        });
+    </script>
+</body>
+</html>

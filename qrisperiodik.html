@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <script src="auth.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PENGECEKAN QRIS H+0 - RANGER+ Monitoring System</title>
+
+    <!-- CSS Eksternal (Pastikan file styles.css satu folder dengan file ini) -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Library External untuk Render Gambar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Notifikasi Toast -->
+    <div id="customToast"></div>
+
+    <!-- Modal Preview Gambar -->
+    <div id="previewModal">
+        <div class="modal-content-wrapper">
+            <div class="modal-header">
+                <h3>🔍 Preview Laporan Gambar HD</h3>
+                <button class="modal-close-btn" onclick="closePreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="previewImageContainer">
+                    <span style="color: #94a3b8; font-size: 13px;">Memuat preview...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-copy" onclick="copyImageFromModal()">📋 Salin Gambar</button>
+                <button class="btn-modal-close" onclick="closePreviewModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout-container">
+        <!-- Area Sidebar (Di-load dari sidebarv2.js) -->
+        <div class="sidebar"></div>
+
+        <div class="main-content">
+            <div class="wrapper">
+                <h2 class="main-title">QRIS PERIODIK</h2>
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <span class="toolbar-label">Periode:</span>
+                        <select id="periode">
+                            <option value="1">Batch 1 (23:30:00 - 09:59:59)</option>
+                            <option value="2">Batch 2 (10:00:00 - 13:59:59)</option>
+                            <option value="3">Batch 3 (14:00:00 - 16:59:59)</option>
+                        </select>
+                    </div>
+
+                    <div class="toolbar-group">
+                         <span class="toolbar-label">PIC:</span>
+                        <!-- Input dikunci (readonly) & styling emas agar rapi -->
+                        <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
+                    </div>
+
+                    <button class="generate" onclick="generateReport()">Generate Report</button>
+                    <button class="preview-btn" onclick="openPreviewModal()">Preview Image</button>
+                    <button class="copy" onclick="copyImage()">Copy Image</button>
+                </div>
+
+                <div class="web-display-card">
+                    <div class="web-header-preview">
+                        <h2>PENGECEKAN QRIS H+0</h2>
+                        <p id="webTanggalText">TANGGAL : - | BATCH -</p>
+                        <p id="webPicText">REPORT BY : -</p>
+                    </div>
+
+                    <div class="unified-summary-card">
+                        <div class="unified-summary-header">RESUME CROSSCHECK DATA & NOMINAL</div>
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width: 14%; vertical-align: middle;">Status</th>
+                                    <th colspan="2" style="width: 43%;">Volume Transaksi (Qty)</th>
+                                    <th colspan="2" style="width: 43%;" class="nominal-th">Nominal Transaksi (IDR)</th>
+                                </tr>
+                                <tr>
+                                    <th>Data Recon VS Data Transaksi</th>
+                                    <th>Data Transaksi VS Data Recon</th>
+                                    <th class="nominal-th">Data Recon VS Data Transaksi</th>
+                                    <th class="nominal-th">Data Transaksi VS Data Recon</th>
+                                </tr>
+                            </thead>
+                            <tbody id="webUnifiedMatrixBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="web-tables-grid">
+                        <div>
+                            <div class="section-title">HASIL CROSSCHECK DATA RECON DIBANDING DATA TRANSAKSI</div>
+                            <table class="main-data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 6%;">No</th>
+                                        <th style="width: 27%;">Waktu Trx</th>
+                                        <th style="width: 22%;">ID Transaksi</th>
+                                        <th style="width: 22%;">ID Trx Reff</th>
+                                        <th style="width: 8%;">RC</th>
+                                        <th style="width: 15%;">Nominal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="webHasilBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div>
+                            <div class="section-title">HASIL CROSSCHECK DATA TRANSAKSI DIBANDING DATA RECON</div>
+                            <table class="main-data-table right-theme">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">No</th>
+                                        <th style="width: 24%;">Waktu Trx</th>
+                                        <th style="width: 18%;">ID Trx</th>
+                                        <th style="width: 18%;">ID Reff</th>
+                                        <th style="width: 7%;">RC</th>
+                                        <th style="width: 13%;">Nominal</th>
+                                        <th style="width: 15%;">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="webHasilKananBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="loading" id="loading">Klik "Generate Report" untuk memuat data realtime.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AREA LAPORAN HD UNTUK COPY & PREVIEW -->
+    <div id="reportArea">
+        <div class="header">
+            <table class="header-table">
+                <tr>
+                    <td style="text-align:left; width:50%;">
+                        <div class="logo-container-qris">
+                            <!-- LOGO QRIS LOKAL -->
+                            <img class="qris-logo-img" src="assets/logo-qris.png" alt="Logo QRIS">
+                        </div>
+                    </td>
+                    <td style="text-align:right; width:50%; vertical-align: middle;">
+                        <div class="hero-logo-box">
+                            <!-- LOGO RANGER LOKAL -->
+                            <img src="assets/logo-ranger.png" alt="Logo RANGER+">
+                        </div>
+                    </td>
+                </tr>
+            </table>  
+
+            <h1 class="main-title">PENGECEKAN QRIS H+0</h1>
+            <div class="subtitle">
+                <span id="tanggalText">Tanggal : -</span> | <span id="periodeText">BATCH - | -</span>
+            </div>
+            <div class="subtitle-pic">
+                <span id="picText">REPORT BY : -</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="unified-summary-card">
+                <div class="unified-summary-header">RESUME CROSSCHECK DATA & NOMINAL</div>
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width: 14%; vertical-align: middle;">Status</th>
+                            <th colspan="2" style="width: 43%;">Volume Transaksi (Qty)</th>
+                            <th colspan="2" style="width: 43%;" class="nominal-th">Nominal Transaksi (IDR)</th>
+                        </tr>
+                        <tr>
+                            <th>Data Recon VS Data Transaksi</th>
+                            <th>Data Transaksi VS Data Recon</th>
+                            <th class="nominal-th">Data Recon VS Data Transaksi</th>
+                            <th class="nominal-th">Data Transaksi VS Data Recon</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unifiedMatrixBody"></tbody>
+                </table>
+            </div>
+
+            <div class="main-tables-grid">
+                <div>
+                    <div class="section-title">HASIL CROSSCHECK DATA RECON DIBANDING DATA TRANSAKSI</div>
+                    <table class="main-data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 6%;">No</th>
+                                <th style="width: 27%;">Waktu Transaksi</th>
+                                <th style="width: 22%;">ID Transaksi</th>
+                                <th style="width: 22%;">ID Trx Reff</th>
+                                <th style="width: 8%;">RC</th>
+                                <th style="width: 15%;">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hasilBody"></tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <div class="section-title">HASIL CROSSCHECK DATA TRANSAKSI DIBANDING DATA RECON</div>
+                    <table class="main-data-table right-theme">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 24%;">Waktu Transaksi</th>
+                                <th style="width: 18%;">ID Transaksi</th>
+                                <th style="width: 18%;">ID Reff</th>
+                                <th style="width: 7%;">RC</th>
+                                <th style="width: 13%;">Nominal</th>
+                                <th style="width: 15%;">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hasilKananBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript Eksternal -->
+    <script src="sidebarv2.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+    // LINK API APPS SCRIPT JSON YANG BARU 
+    const DATA_URL_BASE = "https://script.google.com/macros/s/AKfycbx17SozyrtjQF3nMD1Z4iiKRmYS1XL63rHlBG9IBkqEHinoHpZr5pdthUCI2_FqlSEO7w/exec";
+    
+    // SHEET_NAME kita abaikan agar sistem otomatis mengambil Sheet urutan pertama (paling kiri)
+
+    const statusLabels = [
+        { label: "📊 TOTAL", idx: 2 },
+        { label: "✅ OK", idx: 3 },
+        { label: "↩️ REFUND", idx: 4 },
+        { label: "❌ NOT OK", idx: 5 }
+    ];
+
+    function periodeLabel(val) {
+        if (val === "1") return "23:30:00 - 09:59:59";
+        if (val === "2") return "10:00:00 - 13:59:59";
+        return "14:00:00 - 16:59:59";
+    }
+
+    function getRcStyleAndValue(val) {
+        let cleanVal = String(val || '').trim();
+        if (cleanVal === "0") {
+            return { text: "00", style: "style='background-color: #d1fae5; color: #065f46; font-weight: bold;'" };
+        } else if (cleanVal === "68") {
+            return { text: "68", style: "style='background-color: #fee2e2; color: #991b1b; font-weight: bold;'" };
+        }
+        return { text: cleanVal, style: "" };
+    }
+
+    function renderInitialMatrices() {
+        document.getElementById("webUnifiedMatrixBody").innerHTML = "";
+        document.getElementById("unifiedMatrixBody").innerHTML = "";
+        statusLabels.forEach(item => {
+            let rowHTML = `
+                <tr id="row-status-${item.idx}">
+                    <td class="label-cell">${item.label}</td><td class="qty-1">-</td><td class="qty-2">-</td><td class="nom-1">-</td><td class="nom-2">-</td>
+                </tr>`;
+            document.getElementById("webUnifiedMatrixBody").innerHTML += rowHTML;
+            document.getElementById("unifiedMatrixBody").innerHTML += rowHTML;
+        });
+    }
+
+    // FUNGSI MEMANGGIL DATA DARI API YANG SUDAH DIPERBAIKI
+    async function fetchSheetData() {
+        const url = new URL(DATA_URL_BASE);
+        // Kita matikan parameter sheetName agar Apps Script otomatis mengambil Sheet ke-1
+        // url.searchParams.set('sheetName', SHEET_NAME); 
+        url.searchParams.set('cacheBust', Date.now()); // Mencegah cache
+
+        const response = await fetch(url.toString(), { redirect: 'follow' });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // Pengecekan error langsung dari Apps Script
+        if (data.error) {
+            throw new Error("Apps Script Error: " + data.error);
+        }
+        
+        return data;
+    }
+
+    async function prepareCanvasBlob() {
+        const area = document.getElementById("reportArea");
+        area.style.position = "absolute"; area.style.left = "-9999px"; area.style.top = "-9999px";
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const canvas = await html2canvas(area, { scale: 2, useCORS: true, allowTaint: true, logging: false, windowWidth: 1650 });
+        return new Promise(resolve => { canvas.toBlob((blob) => { generatedCanvasBlob = blob; resolve(blob); }, "image/png"); });
+    }
+
+    async function generateReport() {
+        try {
+            document.getElementById("loading").innerText = "Mengambil data realtime dari API...";
+            const periode = document.getElementById("periode").value;
+            const picValue = document.getElementById("pic").value;
+            const tanggalStr = new Date().toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' });
+
+            document.getElementById("webTanggalText").innerText = `TANGGAL : ${tanggalStr.toUpperCase()} | BATCH ${periode} : ${periodeLabel(periode)}`;
+            document.getElementById("webPicText").innerText = `REPORT BY : ${picValue}`;
+            document.getElementById("periodeText").innerText = "BATCH " + periode + " | " + periodeLabel(periode);
+            document.getElementById("picText").innerText = "REPORT BY : " + picValue;
+            document.getElementById("tanggalText").innerText = "Tanggal : " + tanggalStr;
+
+            renderInitialMatrices();
+            document.getElementById("webHasilBody").innerHTML = "";
+            document.getElementById("webHasilKananBody").innerHTML = "";
+
+            // Eksekusi API
+            const rawData = await fetchSheetData();
+            console.log("Data berhasil diambil:", rawData); // Cek isi data di Console Browser (F12)
+
+            const rows = Array.isArray(rawData) ? rawData : (rawData.data || []);
+
+            // Jika tabel kosong, hentikan proses
+            if (rows.length === 0) {
+                document.getElementById("loading").innerText = "Data berhasil diambil, tetapi isi tabel kosong.";
+                return;
+            }
+
+            const rQty1 = rows[2] || []; const rQty2 = rows[3] || [];
+            const rNom1 = rows[7] || []; const rNom2 = rows[8] || [];
+
+            statusLabels.forEach(item => {
+                const webRow = document.getElementById("webUnifiedMatrixBody").querySelector(`#row-status-${item.idx}`);
+                const repRow = document.getElementById("unifiedMatrixBody").querySelector(`#row-status-${item.idx}`);
+                [webRow, repRow].forEach(rowEl => {
+                    if(rowEl) {
+                        rowEl.querySelector('.qty-1').innerText = rQty1[item.idx] || '-';
+                        rowEl.querySelector('.qty-2').innerText = rQty2[item.idx] || '-';
+                        rowEl.querySelector('.nom-1').innerText = rNom1[item.idx] ? formatCurrency(rNom1[item.idx]) : '-';
+                        rowEl.querySelector('.nom-2').innerText = rNom2[item.idx] ? formatCurrency(rNom2[item.idx]) : '-';
+                    }
+                });
+            });
+
+            let kiriHTML = "", kananHTML = "";
+            for (let i = 12; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.every(cell => !cell)) continue;
+                
+                if (row[0] || row[1] || row[2]) {
+                    let rcKiri = getRcStyleAndValue(row[4]);
+                    kiriHTML += `<tr><td>${row[0]||''}</td><td>${row[1]||''}</td><td>${row[2]||''}</td><td>${row[3]||''}</td><td ${rcKiri.style}>${rcKiri.text}</td><td>${row[5] ? formatCurrency(row[5]) : ''}</td></tr>`;
+                }
+                if (row[7] || row[8] || row[9]) {
+                    let ket = (String(row[3]).trim() === String(row[10]).trim() && String(row[2]).trim() === "0") ? "Sukses manual" : "";
+                    let rcKanan = getRcStyleAndValue(row[11]);
+                    kananHTML += `<tr><td>${row[7]||''}</td><td>${row[8]||''}</td><td>${row[9]||''}</td><td>${row[10]||''}</td><td ${rcKanan.style}>${rcKanan.text}</td><td>${row[12] ? formatCurrency(row[12]) : ''}</td><td style="font-weight: bold; color: #ffffff;">${ket}</td></tr>`;
+                }
+            }
+
+            document.getElementById("webHasilBody").innerHTML = kiriHTML;
+            document.getElementById("hasilBody").innerHTML = kiriHTML;
+            document.getElementById("webHasilKananBody").innerHTML = kananHTML;
+            document.getElementById("hasilKananBody").innerHTML = kananHTML;
+            document.getElementById("loading").innerText = "";
+
+            await prepareCanvasBlob();
+            
+        } catch (error) { 
+            console.error(error);
+            document.getElementById("loading").innerText = "Gagal memuat data: " + error.message; 
+            alert("Gagal memuat data! Pastikan Akses Apps Script sudah disetting ke 'Anyone'. Cek pesan loading untuk detail error.");
+        }
+    }
+
+    renderInitialMatrices();
+</script>

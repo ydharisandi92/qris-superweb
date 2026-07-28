@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <script src="auth.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PENGECEKAN QRIS H+1 CROSSBORDER - RANGER+ Monitoring System</title>
+
+    <!-- CSS Global -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Library Render Gambar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* CSS Rapat Khusus UI Web (Di-scoping ke .web-display-card agar #reportArea TETAP HD) */
+        .main-content { padding: 10px 14px !important; gap: 8px !important; }
+        .wrapper { gap: 8px !important; }
+        .main-title { margin: 0 0 6px 0 !important; font-size: 18px !important; }
+        .toolbar { margin-bottom: 8px !important; padding: 6px 12px !important; }
+        
+        .web-display-card { padding: 10px 14px !important; margin-bottom: 0 !important; }
+        .web-display-card .web-header-preview { padding: 6px 10px !important; margin-bottom: 8px !important; }
+        .web-display-card .web-header-preview h2 { font-size: 15px !important; margin: 0 0 2px 0 !important; }
+        .web-display-card .web-header-preview p { font-size: 10px !important; margin: 1px 0 !important; }
+        .web-display-card .unified-summary-card { margin-bottom: 8px !important; }
+        .web-display-card .unified-summary-header { padding: 5px !important; font-size: 11px !important; }
+        .web-display-card .matrix-table th { padding: 4px 2px !important; font-size: 10px !important; }
+        .web-display-card .matrix-table td { padding: 3px 2px !important; font-size: 10.5px !important; }
+        .web-display-card .loading { padding: 4px !important; font-size: 11px !important; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Notifikasi Toast -->
+    <div id="customToast"></div>
+
+    <!-- Modal Preview Gambar -->
+    <div id="previewModal">
+        <div class="modal-content-wrapper">
+            <div class="modal-header">
+                <h3>🔍 Preview Laporan Gambar HD</h3>
+                <button class="modal-close-btn" onclick="closePreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="previewImageContainer">
+                    <span style="color: #94a3b8; font-size: 13px;">Memuat preview...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-copy" onclick="copyImageFromModal()">📋 Salin Gambar</button>
+                <button class="btn-modal-close" onclick="closePreviewModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout-container">
+        <!-- Area Sidebar -->
+        <div class="sidebar"></div>
+
+        <div class="main-content">
+            <div class="wrapper">
+                <h2 class="main-title">QRIS CROSSBORDER</h2>
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <span class="toolbar-label">PIC:</span>
+                        <!-- Input dikunci (readonly) & styling emas agar rapi -->
+                        <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
+                    </div>
+
+                    <button class="generate" onclick="generateReport()">Generate Report</button>
+                    <button class="preview-btn" onclick="openPreviewModal()">Preview Image</button>
+                    <button class="copy" onclick="copyImage()">Copy Image</button>
+                </div>
+
+                <div class="web-display-card">
+                    <div class="web-header-preview">
+                        <h2>REKON QRIS H+1 CROSSBORDER</h2>
+                        <p id="webTanggalText">TANGGAL TRANSAKSI : -</p>
+                        <p id="webPicText">REPORT BY : -</p>
+                    </div>
+
+                    <!-- TABEL WEB: RESUME VOLUME (QTY) -->
+                    <div class="unified-summary-card">
+                        <div class="unified-summary-header">RESUME CROSSCHECK QRIS CB (QTY)</div>
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">No.</th>
+                                    <th style="width: 45%;">Title</th>
+                                    <th style="width: 12.5%;">Total</th>
+                                    <th style="width: 12.5%;">OK</th>
+                                    <th style="width: 12.5%;">OK Refund</th>
+                                    <th style="width: 12.5%;">NOT OK</th>
+                                </tr>
+                            </thead>
+                            <tbody id="webQtyBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABEL WEB: RESUME NOMINAL (IDR) -->
+                    <div class="unified-summary-card" style="margin-bottom: 4px;">
+                        <div class="unified-summary-header">RESUME NOMINAL CROSSCHECK QRIS CB (IDR)</div>
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">No.</th>
+                                    <th style="width: 45%;">Title</th>
+                                    <th style="width: 12.5%;">Total</th>
+                                    <th style="width: 12.5%;">OK</th>
+                                    <th style="width: 12.5%;">OK Refund</th>
+                                    <th style="width: 12.5%;">NOT OK</th>
+                                </tr>
+                            </thead>
+                            <tbody id="webNominalBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="loading" id="loading">Klik "Generate Report" untuk memuat data realtime.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AREA LAPORAN HD UNTUK COPY & PREVIEW -->
+    <div id="reportArea">
+        <div class="header">
+            <table class="header-table">
+                <tr>
+                    <td style="text-align:left; width:50%;">
+                        <div class="logo-container-qris">
+                            <img class="qris-logo-img" src="assets/logo-qris.png" alt="Logo QRIS">
+                        </div>
+                    </td>
+                    <td style="text-align:right; width:50%; vertical-align: middle;">
+                        <div class="hero-logo-box">
+                            <img src="assets/logo-ranger.png" alt="Logo RANGER+">
+                        </div>
+                    </td>
+                </tr>
+            </table>    
+
+            <h1 class="main-title">REKON QRIS H+1 CROSSBORDER</h1>
+            <div class="subtitle">
+                <span id="tanggalText">TANGGAL TRANSAKSI : -</span>
+            </div>
+            <div class="subtitle-pic">
+                <span id="picText">REPORT BY : -</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="unified-summary-card" style="margin-bottom: 25px;">
+                <div class="unified-summary-header">RESUME CROSSCHECK QRIS CB (QTY)</div>
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">No.</th>
+                            <th style="width: 45%;">Title</th>
+                            <th style="width: 12.5%;">Total</th>
+                            <th style="width: 12.5%;">OK</th>
+                            <th style="width: 12.5%;">OK Refund</th>
+                            <th style="width: 12.5%;">NOT OK</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qtyBody"></tbody>
+                </table>
+            </div>
+
+            <div class="unified-summary-card">
+                <div class="unified-summary-header">RESUME NOMINAL CROSSCHECK QRIS CB (IDR)</div>
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">No.</th>
+                            <th style="width: 45%;">Title</th>
+                            <th style="width: 12.5%;">Total</th>
+                            <th style="width: 12.5%;">OK</th>
+                            <th style="width: 12.5%;">OK Refund</th>
+                            <th style="width: 12.5%;">NOT OK</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nominalBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript Eksternal -->
+    <script src="sidebarv2.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+        const DATA_URL_BASE = "https://script.google.com/macros/s/AKfycbwoWE6pIiSxVbnS9R4LueylTOzBGNaHmeesHYEMeJrHRPUZB6kx9mz6YgHiGB3uugQP/exec";
+        const SHEET_NAME = "QRIS CROSSBORDER"; 
+
+        let generatedCanvasBlob = null;
+
+        const rowTitles = [
+            "Data Recon dibanding Data Transaksi",
+            "Data Transaksi dibanding Data Recon",
+            "Data Settlement dibanding Data Transaksi",
+            "Data Transaksi dibanding Data Settlement"
+        ];
+
+        function formatCurrencyIDR(value) {
+            let num = parseFloat(String(value || 0).replace(/[^0-9.-]/g, ''));
+            if (isNaN(num)) num = 0;
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0
+            }).format(num);
+        }
+
+        function renderInitialTables() {
+            const createEmptyRows = () => {
+                return rowTitles.map((title, idx) => `
+                    <tr>
+                        <td style="text-align: center;">${idx + 1}</td>
+                        <td class="label-cell">${title}</td>
+                        <td style="font-weight: 800; text-align: center;">-</td>
+                        <td style="font-weight: 800; color: #10b981; text-align: center;">-</td>
+                        <td style="font-weight: 800; color: #f59e0b; text-align: center;">-</td>
+                        <td style="font-weight: 800; color: #ef4444; text-align: center;">-</td>
+                    </tr>
+                `).join('');
+            };
+
+            document.getElementById("webQtyBody").innerHTML = createEmptyRows();
+            document.getElementById("webNominalBody").innerHTML = createEmptyRows();
+            document.getElementById("qtyBody").innerHTML = createEmptyRows();
+            document.getElementById("nominalBody").innerHTML = createEmptyRows();
+        }
+
+        async function fetchSheetData() {
+            const url = new URL(DATA_URL_BASE);
+            url.searchParams.set('sheetName', SHEET_NAME);
+            url.searchParams.set('cacheBust', Date.now());
+
+            const response = await fetch(url.toString(), { redirect: 'follow' });
+            if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
+
+            const json = await response.json();
+            if (json.error) throw new Error(json.error);
+            
+            return parseCrossborderData(json);
+        }
+
+        function parseCrossborderData(json) {
+            let rawRows = Array.isArray(json) ? json : (json.data || json.values || []);
+            
+            let qtyData = [];
+            let nominalData = [];
+
+            rawRows.forEach(row => {
+                if (!row || row.length < 3) return;
+                
+                const colB = String(row[1]).trim();
+                
+                if (colB.includes("Data Recon dibanding") || colB.includes("Data Transaksi dibanding") || colB.includes("Data Settlement dibanding")) {
+                    let extractedValues = {
+                        total: row[2] !== undefined && row[2] !== "" ? String(row[2]) : '0',
+                        ok: row[3] !== undefined && row[3] !== "" ? String(row[3]) : '0',
+                        ok_refund: row[4] !== undefined && row[4] !== "" ? String(row[4]) : '0',
+                        not_ok: row[5] !== undefined && row[5] !== "" ? String(row[5]) : '0'
+                    };
+
+                    if (qtyData.length < 4) {
+                        qtyData.push(extractedValues);
+                    } else if (nominalData.length < 4) {
+                        nominalData.push(extractedValues);
+                    }
+                }
+            });
+
+            while(qtyData.length < 4) qtyData.push({total:'0', ok:'0', ok_refund:'0', not_ok:'0'});
+            while(nominalData.length < 4) nominalData.push({total:'0', ok:'0', ok_refund:'0', not_ok:'0'});
+
+            return {
+                qty: qtyData,
+                nominal: nominalData
+            };
+        }
+
+        async function prepareCanvasBlob() {
+            const area = document.getElementById("reportArea");
+            area.style.position = "absolute"; area.style.left = "-9999px"; area.style.top = "-9999px";
+            await new Promise(resolve => setTimeout(resolve, 300));
+            const canvas = await html2canvas(area, { scale: 2, useCORS: true, allowTaint: true, logging: false, windowWidth: 1650 });
+            return new Promise(resolve => { canvas.toBlob((blob) => { generatedCanvasBlob = blob; resolve(blob); }, "image/png"); });
+        }
+
+        async function generateReport() {
+            try {
+                document.getElementById("loading").innerText = "Mengambil data realtime dari API...";
+                const picValue = document.getElementById("pic").value;
+                
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const tanggalStr = yesterday.toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' });
+
+                document.getElementById("webTanggalText").innerText = `TANGGAL TRANSAKSI : ${tanggalStr.toUpperCase()}`;
+                document.getElementById("webPicText").innerText = `REPORT BY : ${picValue}`;
+                document.getElementById("tanggalText").innerText = `TANGGAL TRANSAKSI : ${tanggalStr.toUpperCase()}`;
+                document.getElementById("picText").innerText = `REPORT BY : ${picValue}`;
+
+                const data = await fetchSheetData();
+
+                const qtyHTML = data.qty.map((item, idx) => `
+                    <tr>
+                        <td style="text-align: center;">${idx + 1}</td>
+                        <td class="label-cell">${rowTitles[idx]}</td>
+                        <td style="font-weight: 800; text-align: center;">${item.total}</td>
+                        <td style="font-weight: 800; color: #10b981; text-align: center;">${item.ok}</td>
+                        <td style="font-weight: 800; color: #f59e0b; text-align: center;">${item.ok_refund}</td>
+                        <td style="font-weight: 800; color: #ef4444; text-align: center;">${item.not_ok}</td>
+                    </tr>
+                `).join('');
+
+                const nominalHTML = data.nominal.map((item, idx) => `
+                    <tr>
+                        <td style="text-align: center;">${idx + 1}</td>
+                        <td class="label-cell">${rowTitles[idx]}</td>
+                        <td style="font-weight: 800; text-align: center;">${formatCurrencyIDR(item.total)}</td>
+                        <td style="font-weight: 800; color: #10b981; text-align: center;">${formatCurrencyIDR(item.ok)}</td>
+                        <td style="font-weight: 800; color: #f59e0b; text-align: center;">${formatCurrencyIDR(item.ok_refund)}</td>
+                        <td style="font-weight: 800; color: #ef4444; text-align: center;">${formatCurrencyIDR(item.not_ok)}</td>
+                    </tr>
+                `).join('');
+
+                document.getElementById("webQtyBody").innerHTML = qtyHTML;
+                document.getElementById("qtyBody").innerHTML = qtyHTML;
+                document.getElementById("webNominalBody").innerHTML = nominalHTML;
+                document.getElementById("nominalBody").innerHTML = nominalHTML;
+
+                document.getElementById("loading").innerText = "";
+
+                await prepareCanvasBlob();
+                if(typeof showToast === "function") showToast("✅ Data Crossborder berhasil dimuat!");
+                
+            } catch (error) { 
+                console.error(error);
+                document.getElementById("loading").innerText = "Gagal mengambil data: " + error.message; 
+                if(typeof showToast === "function") showToast("❌ Gagal merender data.", true);
+                else alert("Gagal memuat data! Pesan: " + error.message);
+            }
+        }
+
+        renderInitialTables();
+    </script>
+</body>
+</html>

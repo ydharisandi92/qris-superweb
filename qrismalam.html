@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRIS MALAM - SECRET WARS</title>
+
+    <!-- CSS Utama (Sudah Mencakup Seluruh Style) -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Library Html2Canvas untuk Render Gambar HD -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="layout-container">
+        <!-- Area Sidebar (Di-render otomatis oleh sidebarv2.js) -->
+        <div class="sidebar"></div>
+
+        <div class="main-content">
+            <div class="wrapper">
+                <h2 class="main-title">MONITORING QRIS MALAM</h2>
+                <div class="info-label" id="reportTimeInfo" style="margin-bottom: 8px;">Hasil Pengecekan: Memuat...</div>
+
+                <!-- Indikator Koneksi Server -->
+                <div class="info-value" style="margin-bottom: 12px; font-size: 12px;">
+                    <span id="statusDot" class="status-dot" style="background: #94a3b8; box-shadow: none;"></span>
+                    <span id="statusText" style="color: #94a3b8; font-weight: 600;">Mengecek Koneksi Server...</span>
+                    <button class="btn-modal-close" style="padding: 3px 8px; font-size: 11px;" onclick="checkServerConnection()">🔄 Cek Server</button>
+                </div>
+
+                <!-- Komponen Pilihan Cut-Off Periode -->
+                <div>
+                    <div class="section-title" style="margin-bottom: 6px;">⏱️ Pilih Cut-off Jam Periode:</div>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px;">
+                        <button type="button" class="btn-periode generate active" onclick="selectPeriode('1', this)">23.00</button>
+                        <button type="button" class="btn-periode btn-modal-close" onclick="selectPeriode('2', this)">00.15</button>
+                        <button type="button" class="btn-periode btn-modal-close" onclick="selectPeriode('3', this)">01.00</button>
+                        <button type="button" class="btn-periode btn-modal-close" onclick="selectPeriode('4', this)">02.00</button>
+                        <button type="button" class="btn-periode btn-modal-close" onclick="selectPeriode('5', this)">02.55</button>
+                    </div>
+                </div>
+
+                <!-- Toolbar Lengkap dengan PIC & Action Buttons -->
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <span class="toolbar-label">PIC:</span>
+                        <!-- Input dikunci (readonly) & styling emas agar rapi -->
+                        <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
+                    </div>
+
+                    <button id="btnTrigger" class="generate" onclick="triggerCheck()">🚀 Jalankan Pengecekan</button>
+                    <button class="preview-btn" onclick="openPreviewModal()">🔍 Preview Image</button>
+                    <button class="copy" onclick="copyImage()">📋 Copy Image</button>
+                </div>
+
+                <!-- Grid Ringkasan SC vs WP (Default 0 Saat Refresh) -->
+                <div class="info-bar">
+                    <div class="info-card">
+                        <div class="info-label" style="border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 8px;">#QRIS CPANEL SC</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span class="info-label">Total Transaksi:</span>
+                            <span class="info-value" id="trxSC">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span class="info-label">Total Amount:</span>
+                            <span class="info-value" id="nominalSC">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label" style="border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 8px;">#QRIS CPANEL WP</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span class="info-label">Total Transaksi:</span>
+                            <span class="info-value" id="trxWP">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span class="info-label">Total Amount:</span>
+                            <span class="info-value" id="nominalWP">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner Status Dashboard (DI TARUH PALING BAWAH & DEFAULT MENUNGGU CROSSCHECK) -->
+                <div id="statusBanner" class="hero-banner" style="display: flex; justify-content: center; text-align: center; font-weight: 800; font-size: 15px; margin-top: 4px;">
+                    MENUNGGU CROSSCHECK
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP LOADING LAZY LOAD ANIMATED (KERETA UAP WIDE) -->
+    <div id="loadingModal">
+        <div class="loading-card">
+            <img src="assets/loading-train.svg" alt="Loading Kereta">
+            <div class="loading-title" id="loadingTitle">Memproses Pengecekan QRIS...</div>
+            <div class="loading-sub" id="loadingSub">Playwright sedang membuka database & mengekstrak data realtime...</div>
+        </div>
+    </div>
+
+    <!-- POPUP CUSTOM NOTIFIKASI DI TENGAH -->
+    <div id="customAlertModal">
+        <div class="alert-card">
+            <div class="alert-icon" id="alertIcon">✅</div>
+            <div class="alert-title" id="alertTitle">Pemberitahuan</div>
+            <div class="alert-msg" id="alertMessage">Pesan notifikasi...</div>
+            <button class="btn-alert-ok" onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
+
+    <!-- Modal Preview Gambar Popup -->
+    <div id="previewModal">
+        <div class="modal-content-wrapper">
+            <div class="modal-header">
+                <h3>🔍 Preview Laporan Gambar HD</h3>
+                <button class="modal-close-btn" onclick="closePreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="previewImageContainer">
+                    <span style="color: #94a3b8; font-size: 13px;">Memuat preview...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-copy" onclick="copyImageFromModal()">📋 Salin Gambar</button>
+                <button class="btn-modal-close" onclick="closePreviewModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="customToast">Gambar Berhasil Disalin ke Clipboard!</div>
+
+    <!-- ================= AREA TEMPLATE LAPORAN HD (1920x1080) ================= -->
+    <div id="reportArea">
+        <div class="rep-header">
+            <div class="rep-topbar">
+                <img class="rep-logo-qris" src="assets/logo-qris.png" alt="Logo QRIS">
+                <img class="rep-logo-ranger" src="assets/logo-ranger.png" alt="Logo RANGER+">
+            </div>
+
+            <div class="rep-title">QRIS MONITORING REPORT MALAM</div>
+            <div class="rep-datetime" id="repDatetime">- | 23.00 WIB</div>
+        </div>
+
+        <div class="rep-content">
+            <!-- Kartu Speedcash & Winpay -->
+            <div class="rep-cards">
+                <div class="rep-card">
+                    <div class="rep-card-title">SPEEDCASH</div>
+                    <div class="rep-card-body">
+                        <div class="rep-metric">
+                            <div class="rep-metric-title">JUMLAH TOTAL TRANSAKSI</div>
+                            <div class="rep-metric-value" id="repB4">0</div>
+                        </div>
+                        <div class="rep-metric">
+                            <div class="rep-metric-title">JUMLAH TOTAL AMOUNT</div>
+                            <div class="rep-metric-value rep-metric-rp" id="repB5">Rp 0,00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rep-card">
+                    <div class="rep-card-title">WINPAY</div>
+                    <div class="rep-card-body">
+                        <div class="rep-metric">
+                            <div class="rep-metric-title">JUMLAH TOTAL TRANSAKSI</div>
+                            <div class="rep-metric-value" id="repB8">0</div>
+                        </div>
+                        <div class="rep-metric">
+                            <div class="rep-metric-title">JUMLAH TOTAL AMOUNT</div>
+                            <div class="rep-metric-value rep-metric-rp" id="repB9">Rp 0,00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Box Selisih SC vs WP -->
+            <div class="rep-diff-box">
+                <div class="rep-diff-item">
+                    <div class="rep-diff-title">
+                        <div class="rep-icon-circle icon-orange">📊</div>SELISIH TRANSAKSI (SC - WP)
+                    </div>
+                    <div class="rep-diff-value" id="repSelisihTrx">0</div>
+                </div>
+
+                <div class="rep-diff-item">
+                    <div class="rep-diff-title">
+                        <div class="rep-icon-circle icon-blue">💰</div>SELISIH AMOUNT (SC - WP)
+                    </div>
+                    <div class="rep-diff-value rep-metric-rp" id="repSelisihNominal">Rp 0,00</div>
+                </div>
+
+                <div class="rep-diff-item">
+                    <div class="rep-diff-title">
+                        <div class="rep-icon-circle icon-green">📈</div>PERSENTASE SELISIH AMOUNT
+                    </div>
+                    <div class="rep-diff-value" id="repPersentase">0.00%</div>
+                </div>
+            </div>
+
+            <!-- Box Validasi & Legenda Aturan -->
+            <div class="rep-validation-layout">
+                <div class="rep-val-left" id="repValLeftBox">
+                    <div class="rep-status-head">
+                        <div class="rep-status-icon bg-aman" id="repStatusIcon">✓</div>
+                        <div>
+                            <div class="rep-status-title">STATUS VALIDASI</div>
+                            <div class="rep-status-text status-text-aman" id="repStatusText">MENUNGGU CROSSCHECK</div>
+                        </div>
+                    </div>
+
+                    <div class="rep-summary-card">
+                        <div class="rep-summary-title">RINGKASAN STATUS</div>
+                        <div class="rep-status-desc" id="repStatusDesc">
+                            SILAHKAN JALANKAN PENGECEKAN UNTUK MEMPERBAHARUI DATA REALTIME
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rep-val-right">
+                    <div class="rep-val-title">📋 KETERANGAN VALIDASI &amp; DETAIL</div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px; justify-content: center; flex: 1;">
+                        <div class="rep-rule-item">
+                            <span class="rep-badge badge-ok">✓</span>
+                            <span>Jika jumlah transaksi QRIS SC dan WP sama / tidak ada selisih - status dikategorikan <b style="color: #0f9d32;">AMAN</b></span>
+                        </div>
+
+                        <div class="rep-rule-item">
+                            <span class="rep-badge badge-ok">✓</span>
+                            <span>Jika jumlah transaksi QRIS SC dan WP terdapat selisih kecil / belum melewati batas toleransi 20 transaksi - status masih dikategorikan <b style="color: #0f9d32;">AMAN / WAJAR</b></span>
+                        </div>
+
+                        <div class="rep-rule-item rep-rule-notice">
+                            <span class="rep-badge badge-risk">!</span>
+                            <span><b>NOTICE :</b> Jika selisih jumlah total transaksi antara QRIS SC dan WP melebihi batas <b>20 transaksi</b> - status dikategorikan <b style="color: #d7193f;">HIGH RISK</b></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Laporan -->
+            <div class="rep-footer" id="repFooterText">
+                LAPORAN INI DIHASILKAN OTOMATIS DARI SISTEM QRIS MONITORING | REPORT BY : PUTRA
+            </div>
+        </div>
+    </div>
+
+    <!-- Script External & Logika Sistem -->
+    <script src="sidebarv2.js"></script>
+    <script>
+        const SERVER_URL = "https://qris-malam-surabaya.loca.lt"; 
+        let selectedPeriode = "1";
+        let generatedCanvasBlob = null;
+
+        const cutOffLabels = {
+            "1": "23.00",
+            "2": "00.15",
+            "3": "01.00",
+            "4": "02.00",
+            "5": "02.55"
+        };
+
+        function formatRupiahHD(value) {
+            return 'Rp ' + Number(value || 0).toLocaleString('id-ID', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function formatRupiahShort(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 2 }).format(number);
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("customToast");
+            if (!toast) return;
+            toast.innerText = message;
+            toast.classList.toggle("error", isError);
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        function showCustomAlert(message, title = "Pemberitahuan", icon = "✅") {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = message;
+            document.getElementById('alertIcon').innerText = icon;
+            document.getElementById('customAlertModal').style.display = "flex";
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('customAlertModal').style.display = "none";
+        }
+
+        function showLoadingModal(title, subtitle) {
+            document.getElementById('loadingTitle').innerText = title || "Memproses Pengecekan...";
+            document.getElementById('loadingSub').innerText = subtitle || "Mohon tunggu sejenak, sistem sedang bekerja.";
+            document.getElementById('loadingModal').style.display = "flex";
+        }
+
+        function hideLoadingModal() {
+            document.getElementById('loadingModal').style.display = "none";
+        }
+
+        function selectPeriode(periodeId, element) {
+            selectedPeriode = periodeId;
+            document.querySelectorAll('.btn-periode').forEach(btn => {
+                btn.classList.remove('generate', 'active');
+                btn.classList.add('btn-modal-close');
+            });
+            element.classList.remove('btn-modal-close');
+            element.classList.add('generate', 'active');
+            updateReportHeader();
+        }
+
+        function updateReportHeader() {
+            const pic = document.getElementById("pic").value;
+            const cutOff = cutOffLabels[selectedPeriode] || "23.00";
+            const dateStr = document.getElementById('reportTimeInfo').dataset.dateStr || '-';
+            
+            document.getElementById("repDatetime").innerText = `${dateStr.toUpperCase()} | ${cutOff} WIB`;
+            document.getElementById("repFooterText").innerText = `LAPORAN INI DIHASILKAN OTOMATIS DARI SISTEM QRIS MONITORING | DATA PER ${dateStr.toUpperCase()} ${cutOff} WIB | REPORT BY : ${pic}`;
+        }
+
+        async function checkServerConnection() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+
+            dot.style.backgroundColor = "#f59e0b";
+            dot.style.boxShadow = "none";
+            text.innerText = "Mengecek Koneksi Server...";
+            text.style.color = "#fbbf24";
+
+            try {
+                const res = await fetch(`${SERVER_URL}/api/ping`, {
+                    method: 'GET',
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+
+                if (res.ok) {
+                    dot.style.backgroundColor = "#10b981";
+                    dot.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.25)";
+                    text.innerText = "Server Online (Terhubung)";
+                    text.style.color = "#34d399";
+                } else {
+                    throw new Error("Server Error");
+                }
+            } catch (err) {
+                dot.style.backgroundColor = "#ef4444";
+                dot.style.boxShadow = "none";
+                text.innerText = "Server Offline (Terputus)";
+                text.style.color = "#f87171";
+            }
+        }
+
+        async function triggerCheck() {
+            const btn = document.getElementById('btnTrigger');
+            btn.disabled = true;
+
+            showLoadingModal(
+                `Memproses Periode ${selectedPeriode} (${cutOffLabels[selectedPeriode]} WIB)...`,
+                "Playwright di laptop sedang login, mengeksekusi query database, dan mengirimkan hasil ke Google Sheets..."
+            );
+
+            try {
+                const res = await fetch(`${SERVER_URL}/api/trigger-qris`, { 
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true' 
+                    },
+                    body: JSON.stringify({ periode: selectedPeriode })
+                });
+                const result = await res.json();
+                
+                showLoadingModal("Sinkronisasi Google Sheets...", "Memutakhirkan laporan & mengambil data terbaru...");
+                
+                setTimeout(async () => {
+                    await loadReportData();
+                    hideLoadingModal();
+                    showCustomAlert(result.message, "Pengecekan Selesai", "🎉");
+                }, 12000);
+
+            } catch (err) {
+                hideLoadingModal();
+                showCustomAlert("Gagal terhubung ke Laptop Server! Pastikan Python & Tunnel tetap menyala.", "Koneksi Terputus", "❌");
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function loadReportData() {
+            try {
+                const res = await fetch(`${SERVER_URL}/api/get-qris-data`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                const data = await res.json();
+
+                if (data.report_date && data.report_time) {
+                    const timeInfo = `Hasil Pengecekan tgl ${data.report_date} Jam ${data.report_time} WIB`;
+                    document.getElementById('reportTimeInfo').innerText = timeInfo;
+                    document.getElementById('reportTimeInfo').dataset.dateStr = data.report_date;
+                }
+
+                const trxSC = Number(data.trx_sc || 0);
+                const nominalSC = Number(data.nominal_sc || 0);
+                const trxWP = Number(data.trx_wp || 0);
+                const nominalWP = Number(data.nominal_wp || 0);
+
+                const selisihTrx = Math.abs(trxSC - trxWP);
+                const selisihNominal = Math.abs(nominalSC - nominalWP);
+                const persenSelisih = nominalSC > 0 ? (selisihNominal / nominalSC) * 100 : 0;
+
+                // 1. Update Dashboard Web Utama
+                document.getElementById('trxSC').innerText = trxSC.toLocaleString('id-ID');
+                document.getElementById('nominalSC').innerText = formatRupiahShort(nominalSC);
+                document.getElementById('trxWP').innerText = trxWP.toLocaleString('id-ID');
+                document.getElementById('nominalWP').innerText = formatRupiahShort(nominalWP);
+
+                const statusBanner = document.getElementById('statusBanner');
+                statusBanner.innerText = data.status_message || 'MASIH DALAM KATEGORI "AMAN" / WAJAR';
+
+                // 2. Update Template Gambar HD (#reportArea)
+                document.getElementById('repB4').innerText = trxSC.toLocaleString('id-ID');
+                document.getElementById('repB5').innerText = formatRupiahHD(nominalSC);
+                document.getElementById('repB8').innerText = trxWP.toLocaleString('id-ID');
+                document.getElementById('repB9').innerText = formatRupiahHD(nominalWP);
+
+                document.getElementById('repSelisihTrx').innerText = selisihTrx.toLocaleString('id-ID');
+                document.getElementById('repSelisihNominal').innerText = formatRupiahHD(selisihNominal);
+                document.getElementById('repPersentase').innerText = persenSelisih.toFixed(2) + '%';
+
+                // Logika Status Validasi
+                const valLeftBox = document.getElementById('repValLeftBox');
+                const statusIcon = document.getElementById('repStatusIcon');
+                const statusText = document.getElementById('repStatusText');
+                const statusDesc = document.getElementById('repStatusDesc');
+
+                if (selisihTrx > 20) {
+                    statusText.innerText = 'HIGH RISK';
+                    statusText.className = 'rep-status-text status-text-risk';
+                    statusIcon.innerText = '✕';
+                    statusIcon.className = 'rep-status-icon bg-tidakaman';
+                    valLeftBox.style.borderColor = '#d60000';
+                    statusDesc.innerText = 'WARNING : QRIS CPANEL SC DAN CPANEL WP TERDAPAT SELISIH MELEBIHI BATAS 20 TRANSAKSI. SILAHKAN MELAKUKAN PENGECEKAN LANJUTAN !!!';
+                } else if (selisihTrx > 0 || selisihNominal > 0) {
+                    statusText.innerText = 'AMAN / WAJAR';
+                    statusText.className = 'rep-status-text status-text-aman';
+                    statusIcon.innerText = '✓';
+                    statusIcon.className = 'rep-status-icon bg-aman';
+                    valLeftBox.style.borderColor = '#18a84a';
+                    statusDesc.innerText = 'QRIS SC DAN WP TERDAPAT SELISIH JUMLAH TOTAL TRANSAKSI DAN AMOUNT - MASIH DALAM BATAS AMAN';
+                } else {
+                    statusText.innerText = 'AMAN';
+                    statusText.className = 'rep-status-text status-text-aman';
+                    statusIcon.innerText = '✓';
+                    statusIcon.className = 'rep-status-icon bg-aman';
+                    valLeftBox.style.borderColor = '#18a84a';
+                    statusDesc.innerText = 'JUMLAH TOTAL TRANSAKSI DAN AMOUNT QRIS ANTARA CPANEL SC DAN CPANEL WP SAMA / TIDAK ADA SELISIH';
+                }
+
+                updateReportHeader();
+
+            } catch (err) {
+                console.error("Gagal mengambil data report:", err);
+            }
+        }
+
+        /* Logika Render & Copy Gambar HD 1920x1080 (Solid Background) */
+        async function prepareCanvasBlob() {
+            updateReportHeader();
+            const area = document.getElementById("reportArea");
+            
+            const canvas = await html2canvas(area, {
+                scale: 1,
+                width: 1920,
+                height: 1080,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false
+            });
+
+            return new Promise(resolve => {
+                canvas.toBlob((blob) => {
+                    generatedCanvasBlob = blob;
+                    resolve(blob);
+                }, "image/png");
+            });
+        }
+
+        async function openPreviewModal() {
+            showLoadingModal("Generating Image HD...", "Ranger+ sedang merender template gambar laporan HD 1920x1080...");
+            const modal = document.getElementById("previewModal");
+            const container = document.getElementById("previewImageContainer");
+
+            try {
+                const blob = await prepareCanvasBlob();
+                const imgUrl = URL.createObjectURL(blob);
+                container.innerHTML = `<img src="${imgUrl}" alt="Preview Laporan HD">`;
+                modal.style.display = "flex";
+            } catch (err) {
+                console.error(err);
+                showCustomAlert("Gagal membuat preview gambar.", "Error Render", "⚠️");
+            } finally {
+                hideLoadingModal();
+            }
+        }
+
+        function closePreviewModal() {
+            document.getElementById("previewModal").style.display = "none";
+        }
+
+        async function copyImage() {
+            showLoadingModal("Menyalin Gambar...", "Menyiapkan gambar HD 1920x1080 ke clipboard...");
+            try {
+                const blob = await prepareCanvasBlob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                showToast("📋 Gambar Laporan HD Berhasil Disalin!");
+            } catch (err) {
+                showCustomAlert("Gagal menyalin gambar. Gunakan browser modern (Chrome/Edge).", "Gagal Copy", "⚠️");
+                console.error(err);
+            } finally {
+                hideLoadingModal();
+            }
+        }
+
+        async function copyImageFromModal() {
+            closePreviewModal();
+            await copyImage();
+        }
+
+        // Init Panggilan Pertama
+        checkServerConnection();
+    </script>
+</body>
+</html>

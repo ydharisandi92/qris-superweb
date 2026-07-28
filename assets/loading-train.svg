@@ -1,0 +1,91 @@
+<svg width="340" height="105" viewBox="0 0 320 95" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 16px auto; display: block;">
+  <defs>
+    <!-- Jalur Gelombang Asap Sangat Panjang ke Belakang (Kiri) -->
+    <path id="smokeWavePath" d="M -110 2 C -50 24 20 2 100 18 C 150 32 195 10 233 33" fill="none"/>
+    
+    <!-- Gradient Warna Teks Asap Memudar ke Belakang -->
+    <linearGradient id="textSmokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94a3b8" stop-opacity="0" />
+      <stop offset="15%" stop-color="#10b981" stop-opacity="0.5" />
+      <stop offset="65%" stop-color="#38bdf8" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#f8fafc" stop-opacity="1" />
+    </linearGradient>
+  </defs>
+
+  <g>
+    <!-- 1. ANIMASI TEKS ASAP BERGELOMBANG (DURASI 5.0s) -->
+    <!-- Gelombang Teks 1 -->
+    <text font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="12" fill="url(#textSmokeGrad)">
+      <textPath href="#smokeWavePath" startOffset="110%">
+        j o O o O o S s S s S s S s S s S s S
+        <animate attributeName="startOffset" from="110%" to="-75%" dur="5.0s" repeatCount="indefinite" begin="0s" />
+      </textPath>
+    </text>
+
+    <!-- Gelombang Teks 2 -->
+    <text font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="12" fill="url(#textSmokeGrad)">
+      <textPath href="#smokeWavePath" startOffset="110%">
+        j o O o O o S s S s S s S s S s S s S
+        <animate attributeName="startOffset" from="110%" to="-75%" dur="5.0s" repeatCount="indefinite" begin="2.5s" />
+      </textPath>
+    </text>
+
+    <!-- 2. BADAN KERETA (DIGESER LEBIH KE KANAN) -->
+    <g>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 0 -1.5; 0 0" dur="0.25s" repeatCount="indefinite" />
+
+      <!-- Kabin Masinis -->
+      <rect x="175" y="42" width="28" height="30" rx="3" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+      <path d="M 172 42 L 206 42" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" />
+      <rect x="181" y="48" width="16" height="11" rx="2" fill="#38bdf8" opacity="0.8" />
+
+      <!-- Tangki Utama / Boiler -->
+      <rect x="203" y="50" width="38" height="22" rx="4" fill="#0f172a" stroke="#3b82f6" stroke-width="2" />
+
+      <!-- Cerobong Asap -->
+      <path d="M 225 50 L 225 35 L 233 33 L 233 50 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+
+      <!-- Lampu Depan & Sorot Cahaya -->
+      <polygon points="241,55 249,53 249,63 241,61" fill="#f59e0b" />
+      <path d="M 249 58 L 315 38 L 315 78 Z" fill="#f59e0b" opacity="0.2">
+        <animate attributeName="opacity" values="0.1;0.35;0.1" dur="0.5s" repeatCount="indefinite" />
+      </path>
+
+      <!-- Bumper Depan -->
+      <polygon points="241,68 253,74 241,74" fill="#3b82f6" />
+    </g>
+
+    <!-- 3. RODA BERPUTAR SEARAH JARUM JAM -->
+    <g transform="translate(188, 74)">
+      <circle cx="0" cy="0" r="8" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+      <line x1="-8" y1="0" x2="8" y2="0" stroke="#10b981" stroke-width="2">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.7s" repeatCount="indefinite" />
+      </line>
+      <line x1="0" y1="-8" x2="0" y2="8" stroke="#10b981" stroke-width="2">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.7s" repeatCount="indefinite" />
+      </line>
+    </g>
+
+    <g transform="translate(210, 74)">
+      <circle cx="0" cy="0" r="8" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+      <line x1="-8" y1="0" x2="8" y2="0" stroke="#10b981" stroke-width="2">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.7s" repeatCount="indefinite" />
+      </line>
+      <line x1="0" y1="-8" x2="0" y2="8" stroke="#10b981" stroke-width="2">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.7s" repeatCount="indefinite" />
+      </line>
+    </g>
+
+    <g transform="translate(230, 76)">
+      <circle cx="0" cy="0" r="6" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8" />
+      <line x1="-6" y1="0" x2="6" y2="0" stroke="#38bdf8" stroke-width="1.5">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.5s" repeatCount="indefinite" />
+      </line>
+    </g>
+
+    <!-- 4. REL KERETA BERJALAN MUNDUR -->
+    <line x1="0" y1="82" x2="320" y2="82" stroke="#475569" stroke-width="2" stroke-dasharray="8 4">
+      <animate attributeName="stroke-dashoffset" from="0" to="24" dur="0.5s" repeatCount="indefinite" />
+    </line>
+  </g>
+</svg>
