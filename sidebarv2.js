@@ -58,40 +58,40 @@ document.addEventListener("DOMContentLoaded", function () {
           text-align: center;
           line-height: 1.4;
           font-weight: 500;
+          position: relative;
+          z-index: 999;
+          margin-bottom: 50px; /* Jarak dari bottom-bar L */
       }
+
+      /* STYLE USER BOX (ATAS - BAWAH) */
       .user-box {
           margin-top: 12px;
           padding-top: 12px;
           border-top: 1px solid rgba(255, 255, 255, 0.1);
           text-align: center;
-      }
-      .user-label {
-          font-size: 10px;
-          color: #64748b;
-          font-weight: 700;
-      }
-      .user-name {
-          font-size: 12px;
-          color: #fbbf24;
-          font-weight: 800;
-          margin-top: 2px;
-          margin-bottom: 8px;
-          text-transform: uppercase;
+          position: relative;
+          z-index: 1000;
       }
       .user-actions {
           display: flex;
-          flex-direction: column;
+          flex-direction: column; /* Dibuat Atas - Bawah */
           gap: 6px;
+          width: 100%;
       }
       .btn-action {
           width: 100%;
-          padding: 7px;
+          padding: 8px 10px;
           border-radius: 6px;
           font-size: 11px;
           font-weight: 700;
           border: none;
           cursor: pointer;
+          white-space: nowrap;
           transition: background 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
       }
       .btn-chpass {
           background: #334155;
@@ -101,6 +101,48 @@ document.addEventListener("DOMContentLoaded", function () {
       .btn-chpass:hover { background: #475569; }
       .btn-logout { background: #ef4444; color: #ffffff; }
       .btn-logout:hover { background: #dc2626; }
+
+      /* STYLE LETTER L (BOTTOM BAR) */
+      .bottom-l-bar {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 42px;
+          background: #0f172a;
+          border-top: 1px solid rgba(255, 255, 255, 0.15);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 20px 0 240px; /* Padding kiri agar konten tidak tertutup sidebar vertical */
+          z-index: 998;
+          box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+      }
+      .bottom-l-user {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 11px;
+          color: #94a3b8;
+          font-weight: 600;
+      }
+      .user-badge {
+          background: rgba(251, 191, 36, 0.15);
+          color: #fbbf24;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-weight: 800;
+          border: 1px solid rgba(251, 191, 36, 0.3);
+          text-transform: uppercase;
+      }
+      .status-dot {
+          width: 8px;
+          height: 8px;
+          background-color: #22c55e;
+          border-radius: 50%;
+          display: inline-block;
+          box-shadow: 0 0 8px #22c55e;
+      }
 
       /* MODAL GANTI PASSWORD */
       .modal-overlay {
@@ -130,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.head.appendChild(styleElement);
     }
 
-    // 2. STRUKTUR SIDEBAR
+    // 2. STRUKTUR SIDEBAR (VERTIKAL)
     const sidebarHTML = `
     <div class="sidebar-brand">SECRET WARS</div>
     <div class="nav-menu">
@@ -146,10 +188,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <div id="realtime-clock" style="font-weight: bold; margin-top: 4px;">-</div>
 
         <div class="user-box">
-            <div class="user-label">LOGGED IN AS:</div>
-            <div class="user-name">${currentUser}</div>
             <div class="user-actions">
-                <button onclick="openChangePassModal()" class="btn-action btn-chpass">🔑 Ganti Password</button>
+                <button onclick="openChangePassModal()" class="btn-action btn-chpass">🔑 Ganti Pass</button>
                 <button onclick="logoutUser()" class="btn-action btn-logout">🚪 Logout</button>
             </div>
         </div>
@@ -174,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
   `;
 
-    // 3. RENDER SIDEBAR
+    // 3. RENDER SIDEBAR & BOTTOM BAR (MEMBENTUK HURUF L)
     const sidebarElement = document.querySelector(".sidebar");
     if (sidebarElement) {
         sidebarElement.innerHTML = sidebarHTML;
@@ -188,6 +228,21 @@ document.addEventListener("DOMContentLoaded", function () {
         if (activeItem) {
             activeItem.classList.add("active");
         }
+    }
+
+    // Injeksi elemen Bottom Bar (kaki dari Letter L)
+    if (!document.getElementById("bottom-l-bar")) {
+        const bottomBarHTML = `
+            <div id="bottom-l-bar" class="bottom-l-bar">
+                <div class="bottom-l-user">
+                    <span class="status-dot"></span>
+                    <span>LOGGED IN USER:</span>
+                    <span class="user-badge">${currentUser}</span>
+                </div>
+                <div style="font-size: 10px; color: #64748b;">System Active</div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML("beforeend", bottomBarHTML);
     }
 
     // 4. AUTO INJEK NAMA PIC LOGIN KE INPUT LAPORAN (#pic)
