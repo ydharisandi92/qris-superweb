@@ -60,10 +60,9 @@ document.addEventListener("DOMContentLoaded", function () {
           font-weight: 500;
           position: relative;
           z-index: 999;
-          margin-bottom: 50px; /* Jarak dari bottom-bar L */
+          margin-bottom: 50px;
       }
 
-      /* STYLE USER BOX (ATAS - BAWAH) */
       .user-box {
           margin-top: 12px;
           padding-top: 12px;
@@ -74,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       .user-actions {
           display: flex;
-          flex-direction: column; /* Dibuat Atas - Bawah */
+          flex-direction: column;
           gap: 6px;
           width: 100%;
       }
@@ -114,17 +113,22 @@ document.addEventListener("DOMContentLoaded", function () {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 20px 0 240px; /* Padding kiri agar konten tidak tertutup sidebar vertical */
+          padding: 0 20px 0 240px;
           z-index: 998;
           box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
       }
       .bottom-l-user {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
           font-size: 11px;
           color: #94a3b8;
           font-weight: 600;
+      }
+      .user-badge-container {
+          display: flex;
+          align-items: center;
+          gap: 6px;
       }
       .user-badge {
           background: rgba(251, 191, 36, 0.15);
@@ -134,6 +138,11 @@ document.addEventListener("DOMContentLoaded", function () {
           font-weight: 800;
           border: 1px solid rgba(251, 191, 36, 0.3);
           text-transform: uppercase;
+      }
+      .user-badge.me {
+          background: rgba(34, 197, 94, 0.15);
+          color: #22c55e;
+          border-color: rgba(34, 197, 94, 0.3);
       }
       .status-dot {
           width: 8px;
@@ -214,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
   `;
 
-    // 3. RENDER SIDEBAR & BOTTOM BAR (MEMBENTUK HURUF L)
+    // 3. RENDER SIDEBAR & BOTTOM BAR
     const sidebarElement = document.querySelector(".sidebar");
     if (sidebarElement) {
         sidebarElement.innerHTML = sidebarHTML;
@@ -230,14 +239,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Injeksi elemen Bottom Bar (kaki dari Letter L)
     if (!document.getElementById("bottom-l-bar")) {
         const bottomBarHTML = `
             <div id="bottom-l-bar" class="bottom-l-bar">
                 <div class="bottom-l-user">
                     <span class="status-dot"></span>
-                    <span>LOGGED IN USER:</span>
-                    <span class="user-badge">${currentUser}</span>
+                    <span>ACTIVE ONLINE USERS:</span>
+                    <div id="active-user-badges" class="user-badge-container">
+                        <span class="user-badge me">${currentUser}</span>
+                    </div>
                 </div>
                 <div style="font-size: 10px; color: #64748b;">System Active</div>
             </div>
@@ -254,7 +264,55 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 5. FUNGSI LOGIKA MODAL GANTI PASSWORD
+    // 5. SISTEM HEARTBEAT & SYNC ACTIVE USERS REAL-TIME
+    async function syncActiveUsers() {
+        if (currentUser === "GUEST") return;
+
+        try {
+            // Send Heartbeat
+            await fetch(`${SERVER_URL}/api/heartbeat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: currentUser })
+            });
+
+            // Get List Online Users
+            const res = await fetch(`${SERVER_URL}/api/active-users`);
+            const data = await res.json();
+
+            if (data.active_users && Array.isArray(data.active_users)) {
+                const container = document.getElementById("active-user-badges");
+                if (container) {
+                    container.innerHTML = data.active_users.map(user => {
+                        const isMe = user === currentUser;
+                        return `<span class="user-badge ${isMe ? 'me' : ''}">${user}${isMe ? ' (YOU)' : ''}</span>`;
+                    }).join("");
+                }
+            }
+        } catch (e) {
+            // Jika server offline/terputus
+        }
+    }
+
+    // Jalankan sync pertama kali dan diulang tiap 5 detik
+    syncActiveUsers();
+    setInterval(syncActiveUsers, 5000);
+
+    // Override logout global agar mengirim sinyal logout ke server
+    window.logoutUser = async function () {
+        try {
+            await fetch(`${SERVER_URL}/api/logout-session`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: currentUser })
+            });
+        } catch (e) {}
+
+        sessionStorage.removeItem("loggedInUser");
+        window.location.href = "login.html";
+    };
+
+    // 6. FUNGSI LOGIKA MODAL GANTI PASSWORD
     window.openChangePassModal = function () {
         document.getElementById("modalChPass").style.display = "flex";
     };
@@ -302,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // 6. FUNGSI JAM REAL-TIME
+    // 7. FUNGSI JAM REAL-TIME
     function updateFooterClock() {
         const now = new Date();
         const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
