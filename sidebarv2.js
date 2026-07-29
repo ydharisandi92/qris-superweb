@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
           font-weight: 500;
           position: relative;
           z-index: 999;
-          margin-bottom: 50px;
+          margin-bottom: 60px;
       }
 
       .user-box {
@@ -101,81 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
       .btn-logout { background: #ef4444; color: #ffffff; }
       .btn-logout:hover { background: #dc2626; }
 
-      /* STYLE LETTER L (BOTTOM BAR) - DIPERBAIKI PADDING-LEFT MENJADI 16PX */
-      .bottom-l-bar {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 42px;
-          background: #0f172a;
-          border-top: 1px solid rgba(255, 255, 255, 0.15);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 20px 0 16px; /* Mentok ke pojok kiri */
-          z-index: 998;
-          box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
-      }
-      .bottom-l-user {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 11px;
-          color: #94a3b8;
-          font-weight: 600;
-      }
-      .user-badge-container {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-      }
-      .user-badge {
-          background: rgba(251, 191, 36, 0.15);
-          color: #fbbf24;
-          padding: 3px 8px;
-          border-radius: 4px;
-          font-weight: 800;
-          border: 1px solid rgba(251, 191, 36, 0.3);
-          text-transform: uppercase;
-      }
-      .user-badge.me {
-          background: rgba(34, 197, 94, 0.15);
-          color: #22c55e;
-          border-color: rgba(34, 197, 94, 0.3);
-      }
-      .status-dot {
-          width: 8px;
-          height: 8px;
-          background-color: #22c55e;
-          border-radius: 50%;
-          display: inline-block;
-          box-shadow: 0 0 8px #22c55e;
-      }
-
-      /* STYLE INDIKATOR KONEKSI SERVER LOKAL */
-      .server-status-badge {
-          font-size: 10px;
-          font-weight: 800;
-          padding: 4px 10px;
-          border-radius: 6px;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          transition: all 0.3s ease;
-          display: inline-flex;
-          align-items: center;
-      }
-      .server-status-badge.online {
-          background: rgba(34, 197, 94, 0.15);
-          color: #22c55e;
-          border: 1px solid rgba(34, 197, 94, 0.4);
-      }
-      .server-status-badge.offline {
-          background: rgba(239, 68, 68, 0.15);
-          color: #ef4444;
-          border: 1px solid rgba(239, 68, 68, 0.4);
-      }
-
       /* MODAL GANTI PASSWORD */
       .modal-overlay {
           position: fixed;
@@ -204,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.head.appendChild(styleElement);
     }
 
-    // 2. STRUKTUR SIDEBAR (VERTIKAL)
+    // 2. STRUKTUR SIDEBAR
     const sidebarHTML = `
     <div class="sidebar-brand">SECRET WARS</div>
     <div class="nav-menu">
@@ -228,7 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
     </div>
 
-    <!-- MODAL POPUP GANTI PASSWORD -->
     <div id="modalChPass" class="modal-overlay">
         <div class="modal-box">
             <h3>🔑 Ganti Password (${currentUser})</h3>
@@ -271,20 +195,22 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span id="server-status-badge" class="server-status-badge online">SERVER: ONLINE 🟢</span>
                     </div>
                     <div class="bottom-l-user">
-                        <span class="status-dot"></span>
-                        <span>ACTIVE ONLINE USERS:</span>
+                        <span>ACTIVE USERS:</span>
                         <div id="active-user-badges" class="user-badge-container">
-                            <span class="user-badge me">${currentUser}</span>
+                            <div class="user-badge me">
+                                <span class="user-name-box">${currentUser}</span>
+                                <span class="user-role-text">ADMIN</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div style="font-size: 10px; color: #64748b;">System Active</div>
+                <div style="font-size: 10px; color: #64748b; font-weight: 600;">System Active</div>
             </div>
         `;
         document.body.insertAdjacentHTML("beforeend", bottomBarHTML);
     }
 
-    // 4. AUTO INJEK NAMA PIC LOGIN KE INPUT LAPORAN (#pic)
+    // 4. AUTO INJEK NAMA PIC
     const picElement = document.getElementById("pic");
     if (picElement && currentUser !== "GUEST") {
         picElement.value = currentUser;
@@ -293,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 5. SISTEM HEARTBEAT, SYNC ACTIVE USERS & DETEKSI SERVER LOKAL
+    // 5. HEARTBEAT & SYNC USERS
     async function syncActiveUsers() {
         const serverBadge = document.getElementById("server-status-badge");
 
@@ -318,9 +244,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.active_users && Array.isArray(data.active_users)) {
                     const container = document.getElementById("active-user-badges");
                     if (container) {
-                        container.innerHTML = data.active_users.map(user => {
-                            const isMe = user === currentUser;
-                            return `<span class="user-badge ${isMe ? 'me' : ''}">${user}${isMe ? ' (YOU)' : ''}</span>`;
+                        container.innerHTML = data.active_users.map(uObj => {
+                            const uName = typeof uObj === 'object' ? uObj.username : uObj;
+                            const uRole = (typeof uObj === 'object' ? uObj.role : "OPERATOR") || "OPERATOR";
+                            const isMe = uName === currentUser;
+
+                            return `
+                                <div class="user-badge ${isMe ? 'me' : ''}">
+                                    <span class="user-name-box">${uName}</span>
+                                    <span class="user-role-text">${uRole}</span>
+                                </div>
+                            `;
                         }).join("");
                     }
                 }
@@ -349,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "login.html";
     };
 
-    // 6. FUNGSI LOGIKA MODAL GANTI PASSWORD
+    // 6. GANTI PASSWORD MODAL
     window.openChangePassModal = function () {
         document.getElementById("modalChPass").style.display = "flex";
     };
@@ -397,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // 7. FUNGSI JAM REAL-TIME
+    // 7. JAM REALTIME
     function updateFooterClock() {
         const now = new Date();
         const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
