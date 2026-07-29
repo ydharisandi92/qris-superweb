@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .btn-logout { background: #ef4444; color: #ffffff; }
       .btn-logout:hover { background: #dc2626; }
 
-      /* STYLE LETTER L (BOTTOM BAR) */
+      /* STYLE LETTER L (BOTTOM BAR) - DIPERBAIKI PADDING-LEFT MENJADI 16PX */
       .bottom-l-bar {
           position: fixed;
           bottom: 0;
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 20px 0 240px;
+          padding: 0 20px 0 16px; /* Mentok ke pojok kiri */
           z-index: 998;
           box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
       }
@@ -153,6 +153,29 @@ document.addEventListener("DOMContentLoaded", function () {
           box-shadow: 0 0 8px #22c55e;
       }
 
+      /* STYLE INDIKATOR KONEKSI SERVER LOKAL */
+      .server-status-badge {
+          font-size: 10px;
+          font-weight: 800;
+          padding: 4px 10px;
+          border-radius: 6px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          transition: all 0.3s ease;
+          display: inline-flex;
+          align-items: center;
+      }
+      .server-status-badge.online {
+          background: rgba(34, 197, 94, 0.15);
+          color: #22c55e;
+          border: 1px solid rgba(34, 197, 94, 0.4);
+      }
+      .server-status-badge.offline {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.4);
+      }
+
       /* MODAL GANTI PASSWORD */
       .modal-overlay {
           position: fixed;
@@ -190,6 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <a href="qriscb.html" class="nav-item" data-page="qriscb.html">QRIS CROSSBORDER H+1</a>
       <a href="qrisdomestik.html" class="nav-item" data-page="qrisdomestik.html">QRIS DOMESTIK H+1</a>
       <a href="qrismalam.html" class="nav-item" data-page="qrismalam.html">QRIS MALAM</a>
+      <a href="casetransaksi.html" class="nav-item" data-page="casetransaksi.html">🔍 CASE TRANSAKSI</a>
     </div>
 
     <div class="sidebar-footer">
@@ -242,11 +266,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!document.getElementById("bottom-l-bar")) {
         const bottomBarHTML = `
             <div id="bottom-l-bar" class="bottom-l-bar">
-                <div class="bottom-l-user">
-                    <span class="status-dot"></span>
-                    <span>ACTIVE ONLINE USERS:</span>
-                    <div id="active-user-badges" class="user-badge-container">
-                        <span class="user-badge me">${currentUser}</span>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div id="server-status-container">
+                        <span id="server-status-badge" class="server-status-badge online">SERVER: ONLINE 🟢</span>
+                    </div>
+                    <div class="bottom-l-user">
+                        <span class="status-dot"></span>
+                        <span>ACTIVE ONLINE USERS:</span>
+                        <div id="active-user-badges" class="user-badge-container">
+                            <span class="user-badge me">${currentUser}</span>
+                        </div>
                     </div>
                 </div>
                 <div style="font-size: 10px; color: #64748b;">System Active</div>
@@ -264,41 +293,49 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 5. SISTEM HEARTBEAT & SYNC ACTIVE USERS REAL-TIME
+    // 5. SISTEM HEARTBEAT, SYNC ACTIVE USERS & DETEKSI SERVER LOKAL
     async function syncActiveUsers() {
-        if (currentUser === "GUEST") return;
+        const serverBadge = document.getElementById("server-status-badge");
 
         try {
-            // Send Heartbeat
-            await fetch(`${SERVER_URL}/api/heartbeat`, {
+            const hbRes = await fetch(`${SERVER_URL}/api/heartbeat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username: currentUser })
             });
 
-            // Get List Online Users
-            const res = await fetch(`${SERVER_URL}/api/active-users`);
-            const data = await res.json();
+            if (!hbRes.ok) throw new Error("Server Error");
 
-            if (data.active_users && Array.isArray(data.active_users)) {
-                const container = document.getElementById("active-user-badges");
-                if (container) {
-                    container.innerHTML = data.active_users.map(user => {
-                        const isMe = user === currentUser;
-                        return `<span class="user-badge ${isMe ? 'me' : ''}">${user}${isMe ? ' (YOU)' : ''}</span>`;
-                    }).join("");
+            if (serverBadge) {
+                serverBadge.className = "server-status-badge online";
+                serverBadge.innerText = "SERVER: ONLINE 🟢";
+            }
+
+            if (currentUser !== "GUEST") {
+                const res = await fetch(`${SERVER_URL}/api/active-users`);
+                const data = await res.json();
+
+                if (data.active_users && Array.isArray(data.active_users)) {
+                    const container = document.getElementById("active-user-badges");
+                    if (container) {
+                        container.innerHTML = data.active_users.map(user => {
+                            const isMe = user === currentUser;
+                            return `<span class="user-badge ${isMe ? 'me' : ''}">${user}${isMe ? ' (YOU)' : ''}</span>`;
+                        }).join("");
+                    }
                 }
             }
         } catch (e) {
-            // Jika server offline/terputus
+            if (serverBadge) {
+                serverBadge.className = "server-status-badge offline";
+                serverBadge.innerText = "SERVER: OFFLINE 🔴";
+            }
         }
     }
 
-    // Jalankan sync pertama kali dan diulang tiap 5 detik
     syncActiveUsers();
     setInterval(syncActiveUsers, 5000);
 
-    // Override logout global agar mengirim sinyal logout ke server
     window.logoutUser = async function () {
         try {
             await fetch(`${SERVER_URL}/api/logout-session`, {

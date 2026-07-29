@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <script src="auth.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Transaksi - RANGER+</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* TAB MENU SUB-NAVIGATION */
+        .tab-menu-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .tab-group { display: flex; gap: 10px; }
+        .tab-btn {
+            background: #080d1a; 
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px; 
+            border-radius: 8px;
+            font-size: 13px; 
+            font-weight: 700; 
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn:hover { background: #1e293b; color: #ffffff; }
+        .tab-btn.active { 
+            background: #1565c0; 
+            color: #ffffff; 
+            border-color: #3b82f6; 
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* CARDS & FORMS */
+        .card-box {
+            background: #1e293b; 
+            border: 1px solid var(--border-color);
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .search-form { display: flex; gap: 12px; align-items: center; }
+        .search-input, .select-input, .textarea-input {
+            width: 100%; 
+            padding: 12px 16px; 
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 8px; 
+            color: #ffffff; 
+            font-size: 13px; 
+            font-weight: 600;
+            outline: none; 
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+        .search-input:focus, .select-input:focus, .textarea-input:focus { border-color: #3b82f6; }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            padding: 12px 24px; 
+            background: #1565c0; 
+            color: #ffffff;
+            border: none; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            font-weight: 800;
+            cursor: pointer; 
+            transition: transform 0.15s ease, background 0.2s ease; 
+            white-space: nowrap;
+        }
+        .btn-primary:hover { background: #1e88e5; transform: translateY(-1px); }
+        .btn-success { background: #16a34a; }
+        .btn-success:hover { background: #22c55e; }
+        .btn-sync { padding: 8px 16px; font-size: 12px; background: #334155; border: 1px solid #475569; }
+        .btn-sync:hover { background: #475569; }
+
+        /* FILTER BUTTONS */
+        .filter-btn {
+            padding: 6px 14px; 
+            font-size: 11px; 
+            font-weight: 700; 
+            border-radius: 6px;
+            background: #0f172a; 
+            color: var(--text-muted); 
+            border: 1px solid var(--border-color); 
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover { background: #1e293b; color: #ffffff; }
+        .filter-btn.active { background: var(--accent-gold); color: #0d1527; border-color: var(--accent-gold); }
+
+        /* BADGES */
+        .badge-status {
+            padding: 3px 8px; 
+            border-radius: 4px; 
+            font-size: 10px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+        }
+        .badge-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+        .badge-solved { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
+
+        /* GRID RESULT DISPLAY */
+        .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
+        .data-item {
+            background: #0f172a; 
+            padding: 10px 14px; 
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            text-align: left;
+        }
+        .data-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+        .data-value { font-size: 13px; color: #ffffff; font-weight: 700; word-break: break-all; }
+
+        /* TABLE ALL CASES */
+        .custom-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+        .custom-table th { 
+            background: #0f172a; 
+            color: #ffffff; 
+            padding: 12px; 
+            border-bottom: 2px solid var(--border-color); 
+            text-transform: uppercase; 
+            white-space: nowrap; 
+        }
+        .custom-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: #f8fafc; white-space: nowrap; }
+        .custom-table tbody tr { cursor: pointer; transition: background 0.15s ease; }
+        .custom-table tbody tr:hover { background: rgba(51, 65, 85, 0.6); }
+
+        /* MODAL OVERLAYS SPECIFIC TO CASE TRANSAKSI */
+        .modal-overlay {
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(13, 21, 39, 0.85); 
+            backdrop-filter: blur(5px);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 9999;
+        }
+        .modal-box { 
+            background: #1e293b; 
+            border: 1px solid var(--border-color); 
+            border-radius: 14px; 
+            padding: 24px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        <!-- Area Sidebar -->
+        <div class="sidebar"></div>
+
+        <div class="main-content">
+            <div class="wrapper">
+                <h2 class="main-title">CASE TRANSAKSI</h2>
+
+                <div class="tab-menu-container">
+                    <div class="tab-group">
+                        <button class="tab-btn active" onclick="switchTab('inputTab', this)">➕ Input Case Transaksi</button>
+                        <button class="tab-btn" onclick="switchTab('allCasesTab', this); loadAllCasesFromGSheet();">📊 All Cases (GSheet)</button>
+                    </div>
+                    <button type="button" class="btn-primary btn-sync" onclick="handleSyncTaglist()">🔄 Sync Taglist GSheet</button>
+                </div>
+
+                <!-- SUB MENU 1: INPUT CASE -->
+                <div id="inputTab" class="tab-content active">
+                    <div class="card-box">
+                        <form class="search-form" onsubmit="handleCekTrx(event)">
+                            <input type="text" id="inputTrxId" class="search-input" placeholder="Masukkan ID Transaksi (Contoh: 961494861)..." required autocomplete="off">
+                            <button type="submit" class="btn-primary" id="btnSearch">🔍 CEK TRANSAKSI</button>
+                        </form>
+                    </div>
+
+                    <div id="formKendalaSection" class="card-box" style="display: none; border-left: 4px solid var(--accent-gold);">
+                        <h3 style="margin: 0 0 16px 0; color: var(--accent-gold); font-size: 15px;">📌 DETAIL KENDALA & FOLLOW UP</h3>
+                        <div class="result-grid" style="margin-bottom: 20px;">
+                            <div class="data-item"><div class="data-label">ID Transaksi</div><div class="data-value" id="summaryTrxId">-</div></div>
+                            <div class="data-item"><div class="data-label">ID Pelanggan 1</div><div class="data-value" id="summaryBill1" style="color: #60a5fa;">-</div></div>
+                        </div>
+
+                        <form onsubmit="handleSubmitCase(event)">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                                <div>
+                                    <label class="form-label">🏷️ Taglist Kendala:</label>
+                                    <select id="selectKendala" class="select-input" required><option value="">Memuat taglist kendala...</option></select>
+                                </div>
+                                <div>
+                                    <label class="form-label">🎯 Kemana Harus Follow Up:</label>
+                                    <select id="selectFollowUp" class="select-input" required><option value="">Memuat tujuan follow up...</option></select>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <label class="form-label">📝 Catatan Tambahan (Opsional):</label>
+                                <textarea id="inputCatatan" class="textarea-input" rows="3" placeholder="Tambahkan catatan khusus jika ada..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary btn-success">💾 SIMPAN CASE KE GSHEET</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SUB MENU 2: ALL CASES -->
+                <div id="allCasesTab" class="tab-content">
+                    <div class="card-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <h3 style="margin: 0; color: var(--accent-gold); font-size: 15px;">📊 REKAPITULASI CASE</h3>
+                                <div style="display: flex; gap: 6px;">
+                                    <button id="btnFilterAll" class="filter-btn active" onclick="filterCases('ALL', this)">ALL (0)</button>
+                                    <button id="btnFilterPending" class="filter-btn" onclick="filterCases('PENDING', this)">⏳ PENDING (0)</button>
+                                    <button id="btnFilterSolved" class="filter-btn" onclick="filterCases('SOLVED', this)">✅ SOLVED (0)</button>
+                                </div>
+                            </div>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="loadAllCasesFromGSheet(true)">⟳ Refresh Data</button>
+                        </div>
+
+                        <div style="overflow-x: auto;">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Waktu Input</th>
+                                        <th>ID Transaksi</th>
+                                        <th>ID Produk</th>
+                                        <th>Tgl Transaksi</th>
+                                        <th>ID Pelanggan 1</th>
+                                        <th>Kendala</th>
+                                        <th>Follow Up Ke</th>
+                                        <th>PIC</th>
+                                        <th>Status Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allCasesTableBody">
+                                    <tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP 1: DETAIL CASE & UPDATE CASE (DESAIN MENYAMPING / LANDSCAPE 2 PANEL) -->
+    <div id="caseDetailModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box" style="width: 920px; max-width: 95vw; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">
+                <h3 style="margin: 0; color: var(--accent-gold); font-size: 16px;">📌 DETAIL CASE TRANSAKSI</h3>
+                <span id="detailStatusBadge" class="badge-status badge-pending">PENDING</span>
+            </div>
+
+            <!-- LAYOUT DESAIN MENYAMPING (2 PANEL GRID) -->
+            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; align-items: start;">
+
+                <!-- PANEL KIRI: DATA TRANSAKSI -->
+                <div>
+                    <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #60a5fa; text-transform: uppercase;">📋 Informasi Transaksi</h4>
+                    <div class="result-grid">
+                        <div class="data-item"><div class="data-label">Waktu Input</div><div class="data-value" id="detTime">-</div></div>
+                        <div class="data-item"><div class="data-label">ID Transaksi</div><div class="data-value" id="detTrxId" style="color: var(--accent-gold);">-</div></div>
+                        <div class="data-item"><div class="data-label">ID Produk</div><div class="data-value" id="detProdId">-</div></div>
+                        <div class="data-item"><div class="data-label">Tanggal Transaksi</div><div class="data-value" id="detTxDate">-</div></div>
+                        <div class="data-item"><div class="data-label">ID Pelanggan 1</div><div class="data-value" id="detBill1" style="color: #60a5fa;">-</div></div>
+                        <div class="data-item"><div class="data-label">ID Pelanggan 2</div><div class="data-value" id="detBill2" style="color: #60a5fa;">-</div></div>
+                        <div class="data-item"><div class="data-label">RC (Response Code)</div><div class="data-value" id="detRc">-</div></div>
+                        <div class="data-item"><div class="data-label">SN / Ref</div><div class="data-value" id="detSn" style="color: #34d399;">-</div></div>
+                        <div class="data-item"><div class="data-label">Kendala</div><div class="data-value" id="detKendala" style="color: var(--accent-gold);">-</div></div>
+                        <div class="data-item"><div class="data-label">Follow Up Ke</div><div class="data-value" id="detFollowUp" style="color: #60a5fa;">-</div></div>
+                        <div class="data-item" style="grid-column: span 2;"><div class="data-label">PIC Input</div><div class="data-value" id="detPic">-</div></div>
+                    </div>
+                </div>
+
+                <!-- PANEL KANAN: CATATAN KASUS + FORM UPDATE -->
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #60a5fa; text-transform: uppercase;">📝 Catatan Kasus Awal</h4>
+                        <div class="data-item" style="min-height: 52px;">
+                            <div class="data-value" id="detCatatan" style="color: #e2e8f0; font-weight: 500; font-style: italic; white-space: pre-wrap;">-</div>
+                        </div>
+                    </div>
+
+                    <div style="background: #0f172a; padding: 14px; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
+                        <h4 style="margin: 0; font-size: 12px; color: var(--accent-gold); text-transform: uppercase;">🔄 Form Update Case</h4>
+
+                        <div>
+                            <label class="form-label" style="color: #60a5fa;">STATUS CASE:</label>
+                            <select id="detSelectStatus" class="select-input" style="padding: 10px; font-weight: 700;">
+                                <option value="PENDING">⏳ PENDING</option>
+                                <option value="SOLVED">✅ SOLVED</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" style="color: #60a5fa;">✏️ UPDATE CASE (KOLOM N):</label>
+                            <textarea id="detUpdateCaseInput" class="textarea-input" rows="4" placeholder="Masukkan perkembangan update follow up disini..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER TOMBOL AKSI -->
+            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" class="btn-primary" style="background: #475569;" onclick="closeCaseDetailModal()">Tutup</button>
+                <button type="button" class="btn-primary btn-success" onclick="handleSaveCaseUpdate()">
+                    💾 UPDATE CASE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP 2: MODAL CEK TRANSAKSI -->
+    <div id="resultModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box" style="width: 550px; max-width: 90%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 12px;">
+                <h3 style="margin: 0; color: var(--accent-gold); font-size: 16px;">📋 DATA TRANSAKSI DITEMUKAN</h3>
+                <span id="popRcBadge" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; background: rgba(34, 197, 94, 0.2); color: #22c55e;">RC: 00</span>
+            </div>
+            <div class="result-grid">
+                <div class="data-item"><div class="data-label">ID Transaksi</div><div class="data-value" id="popIdTrx">-</div></div>
+                <div class="data-item"><div class="data-label">ID Produk</div><div class="data-value" id="popIdProduk">-</div></div>
+                <div class="data-item"><div class="data-label">Tanggal Transaksi</div><div class="data-value" id="popTxDate">-</div></div>
+                <div class="data-item"><div class="data-label">Response Code</div><div class="data-value" id="popRc">-</div></div>
+                <div class="data-item"><div class="data-label">ID Pelanggan 1</div><div class="data-value" id="popBill1" style="color: #60a5fa;">-</div></div>
+                <div class="data-item"><div class="data-label">ID Pelanggan 2</div><div class="data-value" id="popBill2" style="color: #60a5fa;">-</div></div>
+                <div class="data-item" style="grid-column: span 2;"><div class="data-label">SN / REF</div><div class="data-value" id="popSn" style="color: #34d399;">-</div></div>
+            </div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button type="button" class="btn-primary btn-success" onclick="confirmAndOpenKendalaForm()">OK, Lanjut Isi Kendala ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUPS GENERAL -->
+    <div id="loadingModal">
+        <div class="loading-card">
+            <img src="assets/loading-train.svg" alt="Loading">
+            <div class="loading-title" id="loadingTitle">Memproses...</div>
+            <div class="loading-sub" id="loadingSub">Mohon tunggu sejenak.</div>
+        </div>
+    </div>
+
+    <div id="customAlertModal">
+        <div class="alert-card">
+            <div class="alert-icon" id="alertIcon">✅</div>
+            <div class="alert-title" id="alertTitle">Pemberitahuan</div>
+            <div class="alert-msg" id="alertMessage">Pesan...</div>
+            <button class="btn-alert-ok" onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script src="sidebarv2.js"></script>
+    <script>
+        const SERVER_URL = "http://localhost:5000";
+        let currentFetchedData = null;
+        let rawAllCases = [];
+        let currentFilteredCases = [];
+        let selectedCaseData = null;
+        let currentFilter = "ALL";
+
+        function formatDateOnly(str) {
+            if (!str || str === '-') return '-';
+            return String(str).split('T')[0].trim();
+        }
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(tb => tb.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function showCustomAlert(msg, title = "Pemberitahuan", icon = "✅") {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = msg;
+            document.getElementById('alertIcon').innerText = icon;
+            document.getElementById('customAlertModal').style.display = "flex";
+        }
+        function closeCustomAlert() { document.getElementById('customAlertModal').style.display = "none"; }
+        function showLoadingModal(t, s) {
+            document.getElementById('loadingTitle').innerText = t || "Memproses...";
+            document.getElementById('loadingSub').innerText = s || "Mohon tunggu.";
+            document.getElementById('loadingModal').style.display = "flex";
+        }
+        function hideLoadingModal() { document.getElementById('loadingModal').style.display = "none"; }
+
+        // CEK TRANSAKSI
+        async function handleCekTrx(e) {
+            e.preventDefault();
+            const trxId = document.getElementById("inputTrxId").value.trim();
+            if (!trxId) return;
+
+            showLoadingModal(`Mencari ID '${trxId}'...`, "Mengecek database Web SQL...");
+            try {
+                const res = await fetch(`${SERVER_URL}/api/cek-transaksi`, {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id_transaksi: trxId })
+                });
+                const data = await res.json();
+                hideLoadingModal();
+
+                if (res.ok && data.status === "success" && data.data) {
+                    currentFetchedData = data.data;
+                    document.getElementById("popIdTrx").innerText = data.data.id_transaksi || "-";
+                    document.getElementById("popIdProduk").innerText = data.data.id_produk || "-";
+                    document.getElementById("popTxDate").innerText = formatDateOnly(data.data.transaction_date);
+                    document.getElementById("popRc").innerText = data.data.status || "-";
+                    document.getElementById("popBill1").innerText = data.data["ID pelanggan 1"] || "-";
+                    document.getElementById("popBill2").innerText = data.data["ID pelanggan 2"] || "-";
+                    document.getElementById("popSn").innerText = data.data.SN || "-";
+                    document.getElementById("resultModal").style.display = "flex";
+                } else {
+                    showCustomAlert(data.message || "Data tidak ditemukan!", "Tidak Ditemukan", "⚠️");
+                }
+            } catch (err) {
+                hideLoadingModal();
+                showCustomAlert("Gagal terhubung ke Server!", "Error", "❌");
+            }
+        }
+
+        function confirmAndOpenKendalaForm() {
+            document.getElementById("resultModal").style.display = "none";
+            if (currentFetchedData) {
+                document.getElementById("summaryTrxId").innerText = currentFetchedData.id_transaksi || "-";
+                document.getElementById("summaryBill1").innerText = currentFetchedData["ID pelanggan 1"] || "-";
+                document.getElementById("formKendalaSection").style.display = "block";
+                document.getElementById("formKendalaSection").scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function loadTaglistsFromGSheet() {
+            try {
+                const res = await fetch(`${SERVER_URL}/api/get-taglist`);
+                const data = await res.json();
+                if (res.ok && data.status === "success") {
+                    document.getElementById("selectKendala").innerHTML = `<option value="">-- Pilih Kendala --</option>` + (data.kendala || []).map(k => `<option value="${k}">${k}</option>`).join("");
+                    document.getElementById("selectFollowUp").innerHTML = `<option value="">-- Pilih Tujuan Follow Up --</option>` + (data.follow_up || []).map(f => `<option value="${f}">${f}</option>`).join("");
+                }
+            } catch (e) {}
+        }
+
+        async function handleSyncTaglist() {
+            showLoadingModal("Menyinkronkan Taglist...", "Mengambil daftar terbaru...");
+            try {
+                const res = await fetch(`${SERVER_URL}/api/sync-taglist`, { method: "POST" });
+                const data = await res.json();
+                hideLoadingModal();
+                if (res.ok && data.status === "success") {
+                    await loadTaglistsFromGSheet();
+                    showCustomAlert("Taglist berhasil diperbarui!", "Sukses", "🎉");
+                } else { showCustomAlert("Gagal sync taglist.", "Gagal", "⚠️"); }
+            } catch (e) { hideLoadingModal(); showCustomAlert("Gagal terhubung ke Server!", "Error", "❌"); }
+        }
+
+        // SIMPAN CASE BARU
+        async function handleSubmitCase(e) {
+            e.preventDefault();
+            if (!currentFetchedData) return;
+
+            showLoadingModal("Menyimpan Case...", "Mengunggah data ke GSheet...");
+            try {
+                const payload = {
+                    data_transaksi: currentFetchedData,
+                    kendala: document.getElementById("selectKendala").value,
+                    follow_up: document.getElementById("selectFollowUp").value,
+                    catatan: document.getElementById("inputCatatan").value,
+                    pic: sessionStorage.getItem("loggedInUser") || "GUEST"
+                };
+
+                const res = await fetch(`${SERVER_URL}/api/save-case-gsheet`, {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                hideLoadingModal();
+
+                if (res.ok && result.status === "success") {
+                    await loadAllCasesFromGSheet(true);
+
+                    showCustomAlert("Case berhasil disimpan!", "Berhasil", "🎉");
+                    document.getElementById("formKendalaSection").style.display = "none";
+                    document.getElementById("inputTrxId").value = "";
+                    document.getElementById("inputCatatan").value = "";
+                    currentFetchedData = null;
+                } else { showCustomAlert("Gagal menyimpan case.", "Error", "⚠️"); }
+            } catch (err) { hideLoadingModal(); showCustomAlert("Gagal terhubung ke Server!", "Error", "❌"); }
+        }
+
+        // REKAP ALL CASES
+        async function loadAllCasesFromGSheet(forceRefresh = false) {
+            const tbody = document.getElementById("allCasesTableBody");
+            if (forceRefresh) tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--accent-gold); padding: 20px;">Memuat ulang data...</td></tr>`;
+
+            try {
+                const res = await fetch(`${SERVER_URL}/api/get-all-cases`);
+                const data = await res.json();
+
+                if (res.ok && data.status === "success" && Array.isArray(data.data)) {
+                    rawAllCases = data.data;
+                    updateFilterCounters();
+                    renderCasesTable();
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #ef4444; padding: 20px;">Gagal memuat rekap data.</td></tr>`;
+                }
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #ef4444; padding: 20px;">Gagal terhubung ke Server!</td></tr>`;
+            }
+        }
+
+        function updateFilterCounters() {
+            const totalAll = rawAllCases.length;
+            const totalPending = rawAllCases.filter(c => (c.case_status || "PENDING").toUpperCase() === "PENDING").length;
+            const totalSolved = rawAllCases.filter(c => (c.case_status || "PENDING").toUpperCase() === "SOLVED").length;
+
+            document.getElementById("btnFilterAll").innerText = `ALL (${totalAll})`;
+            document.getElementById("btnFilterPending").innerText = `⏳ PENDING (${totalPending})`;
+            document.getElementById("btnFilterSolved").innerText = `✅ SOLVED (${totalSolved})`;
+        }
+
+        function filterCases(status, btnElement) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderCasesTable();
+        }
+
+        function renderCasesTable() {
+            const tbody = document.getElementById("allCasesTableBody");
+            currentFilteredCases = rawAllCases;
+
+            if (currentFilter !== "ALL") {
+                currentFilteredCases = rawAllCases.filter(c => (c.case_status || "PENDING").toUpperCase() === currentFilter);
+            }
+
+            if (currentFilteredCases.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">Tidak ada data case (${currentFilter}).</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = currentFilteredCases.map((item, idx) => {
+                const st = (item.case_status || "PENDING").toUpperCase();
+                const badgeClass = st === "SOLVED" ? "badge-solved" : "badge-pending";
+
+                return `
+                    <tr onclick="openCaseDetailModalByFilteredIndex(${idx})">
+                        <td>${idx + 1}</td>
+                        <td>${item.timestamp || '-'}</td>
+                        <td style="font-weight: 700; color: var(--accent-gold);">${item.id_transaksi || '-'}</td>
+                        <td>${item.id_produk || '-'}</td>
+                        <td>${formatDateOnly(item.transaction_date)}</td>
+                        <td style="color: #60a5fa;">${item.bill_info1 || '-'}</td>
+                        <td><b style="color: var(--accent-gold);">${item.kendala || '-'}</b></td>
+                        <td><b style="color: #60a5fa;">${item.follow_up || '-'}</b></td>
+                        <td style="font-weight: 700;">${item.pic || '-'}</td>
+                        <td><span class="badge-status ${badgeClass}">${st}</span></td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        // BUKA POP-UP DETAIL CASE
+        function openCaseDetailModalByFilteredIndex(idx) {
+            selectedCaseData = currentFilteredCases[idx];
+            if (!selectedCaseData) return;
+
+            document.getElementById("detTime").innerText = selectedCaseData.timestamp || "-";
+            document.getElementById("detTrxId").innerText = selectedCaseData.id_transaksi || "-";
+            document.getElementById("detProdId").innerText = selectedCaseData.id_produk || "-";
+            document.getElementById("detTxDate").innerText = formatDateOnly(selectedCaseData.transaction_date);
+            document.getElementById("detBill1").innerText = selectedCaseData.bill_info1 || "-";
+            document.getElementById("detBill2").innerText = selectedCaseData.bill_info2 || "-";
+            document.getElementById("detRc").innerText = selectedCaseData.status || "-";
+            document.getElementById("detSn").innerText = selectedCaseData.sn || "-";
+            document.getElementById("detKendala").innerText = selectedCaseData.kendala || "-";
+            document.getElementById("detFollowUp").innerText = selectedCaseData.follow_up || "-";
+            document.getElementById("detPic").innerText = selectedCaseData.pic || "-";
+            document.getElementById("detCatatan").innerText = selectedCaseData.catatan || "(Tidak ada catatan khusus)";
+
+            const st = (selectedCaseData.case_status || "PENDING").toUpperCase();
+            document.getElementById("detSelectStatus").value = st;
+            document.getElementById("detUpdateCaseInput").value = selectedCaseData.update_case || "";
+
+            const badge = document.getElementById("detailStatusBadge");
+            if (st === "SOLVED") {
+                badge.className = "badge-status badge-solved";
+                badge.innerText = "SOLVED ✅";
+            } else {
+                badge.className = "badge-status badge-pending";
+                badge.innerText = "PENDING ⏳";
+            }
+
+            document.getElementById("caseDetailModal").style.display = "flex";
+        }
+
+        function closeCaseDetailModal() { document.getElementById("caseDetailModal").style.display = "none"; }
+
+        // EKSPLISIT SIMPAN KESELURUHAN UPDATE
+        async function handleSaveCaseUpdate() {
+            if (!selectedCaseData) return;
+
+            const newStatus = document.getElementById("detSelectStatus").value;
+            const updateCaseText = document.getElementById("detUpdateCaseInput").value;
+
+            showLoadingModal("Menyimpan Perubahan...", "Memperbarui status & catatan update di GSheet...");
+            try {
+                const res = await fetch(`${SERVER_URL}/api/update-case-status`, {
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        row_index: selectedCaseData.row_index, 
+                        case_status: newStatus,
+                        update_case: updateCaseText
+                    })
+                });
+                const result = await res.json();
+                hideLoadingModal();
+
+                if (res.ok && result.status === "success") {
+                    closeCaseDetailModal();
+                    await loadAllCasesFromGSheet(true);
+                    showCustomAlert("Update Case berhasil disimpan ke GSheet!", "Berhasil", "🎉");
+                } else { 
+                    showCustomAlert(result.message || "Gagal memperbarui case.", "Error", "⚠️"); 
+                }
+            } catch (err) { 
+                hideLoadingModal(); 
+                showCustomAlert("Gagal terhubung ke Server!", "Error", "❌"); 
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTaglistsFromGSheet();
+            loadAllCasesFromGSheet();
+        });
+    </script>
+</body>
+</html>

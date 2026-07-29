@@ -21,14 +21,7 @@
         <div class="main-content">
             <div class="wrapper">
                 <h2 class="main-title">MONITORING QRIS MALAM</h2>
-                <div class="info-label" id="reportTimeInfo" style="margin-bottom: 8px;">Hasil Pengecekan: Memuat...</div>
-
-                <!-- Indikator Koneksi Server -->
-                <div class="info-value" style="margin-bottom: 12px; font-size: 12px;">
-                    <span id="statusDot" class="status-dot" style="background: #94a3b8; box-shadow: none;"></span>
-                    <span id="statusText" style="color: #94a3b8; font-weight: 600;">Mengecek Koneksi Server...</span>
-                    <button class="btn-modal-close" style="padding: 3px 8px; font-size: 11px;" onclick="checkServerConnection()">🔄 Cek Server</button>
-                </div>
+                <div class="info-label" id="reportTimeInfo" style="margin-bottom: 12px;">Hasil Pengecekan: Memuat...</div>
 
                 <!-- Komponen Pilihan Cut-Off Periode -->
                 <div>
@@ -82,7 +75,7 @@
                     </div>
                 </div>
 
-                <!-- Banner Status Dashboard (DI TARUH PALING BAWAH & DEFAULT MENUNGGU CROSSCHECK) -->
+                <!-- Banner Status Dashboard (DEFAULT MENUNGGU CROSSCHECK) -->
                 <div id="statusBanner" class="hero-banner" style="display: flex; justify-content: center; text-align: center; font-weight: 800; font-size: 15px; margin-top: 4px;">
                     MENUNGGU CROSSCHECK
                 </div>
@@ -324,37 +317,6 @@
             document.getElementById("repFooterText").innerText = `LAPORAN INI DIHASILKAN OTOMATIS DARI SISTEM QRIS MONITORING | DATA PER ${dateStr.toUpperCase()} ${cutOff} WIB | REPORT BY : ${pic}`;
         }
 
-        async function checkServerConnection() {
-            const dot = document.getElementById('statusDot');
-            const text = document.getElementById('statusText');
-
-            dot.style.backgroundColor = "#f59e0b";
-            dot.style.boxShadow = "none";
-            text.innerText = "Mengecek Koneksi Server...";
-            text.style.color = "#fbbf24";
-
-            try {
-                const res = await fetch(`${SERVER_URL}/api/ping`, {
-                    method: 'GET',
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-
-                if (res.ok) {
-                    dot.style.backgroundColor = "#10b981";
-                    dot.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.25)";
-                    text.innerText = "Server Online (Terhubung)";
-                    text.style.color = "#34d399";
-                } else {
-                    throw new Error("Server Error");
-                }
-            } catch (err) {
-                dot.style.backgroundColor = "#ef4444";
-                dot.style.boxShadow = "none";
-                text.innerText = "Server Offline (Terputus)";
-                text.style.color = "#f87171";
-            }
-        }
-
         async function triggerCheck() {
             const btn = document.getElementById('btnTrigger');
             btn.disabled = true;
@@ -534,9 +496,6 @@
             closePreviewModal();
             await copyImage();
         }
-
-        // Init Panggilan Pertama
-        checkServerConnection();
     </script>
 </body>
 </html>
