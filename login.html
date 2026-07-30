@@ -62,7 +62,7 @@
             color: #ffffff;
             font-size: 13px;
             outline: none;
-            text-transform: uppercase; /* Visual kapital di input */
+            text-transform: uppercase;
         }
         .form-group input:focus {
             border-color: #3b82f6;
@@ -95,7 +95,7 @@
             display: none;
         }
 
-        /* STYLES BARU: KONTROL STATUS SERVER & REFRESH */
+        /* STYLES STATUS SERVER & REFRESH */
         .server-status-box {
             margin-top: 20px;
             padding-top: 14px;
@@ -115,13 +115,13 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: #ef4444; /* Default Merah (Offline) */
+            background-color: #ef4444;
             display: inline-block;
             box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
             transition: all 0.3s ease;
         }
         .status-dot.online {
-            background-color: #22c55e; /* Hijau (Online) */
+            background-color: #22c55e;
             box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
         }
         .btn-refresh-server {
@@ -179,7 +179,6 @@
             <div id="errorMsg" class="error-msg">Username atau Password salah!</div>
         </form>
 
-        <!-- SEKSI STATUS SERVER & TOMBOL REFRESH -->
         <div class="server-status-box">
             <div class="status-info">
                 <span id="statusDot" class="status-dot"></span>
@@ -192,8 +191,23 @@
     </div>
 
     <script>
-        // URL SERVER BACKEND DI LAPTOP KAMU
-        const SERVER_URL = "http://192.168.1.50:5000"; // Sesuaikan IP/Port backend laptopmu (misal Python Flask/FastAPI)
+        // URL GOOGLE APPS SCRIPT
+        const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
+        let SERVER_URL = "http://localhost:5000"; // Fallback default
+
+        // AMBIL DYNAMIC SERVER URL DARI GSHEET CONFIG
+        async function initServerUrl() {
+            try {
+                const res = await fetch(`${CASE_SCRIPT_URL}?action=get_server_url`);
+                const data = await res.json();
+                if (data.status === "success" && data.server_url) {
+                    SERVER_URL = data.server_url;
+                    console.log("🌐 Dynamic SERVER_URL Terhubung:", SERVER_URL);
+                }
+            } catch (err) {
+                console.warn("⚠️ Gagal mengambil Dynamic SERVER_URL, memakai fallback localhost.");
+            }
+        }
 
         // 1. FUNGSI CEK KONEKSI SERVER
         async function checkServerStatus() {
@@ -207,7 +221,7 @@
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000); // Timeout 3 detik
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                 const res = await fetch(`${SERVER_URL}/api/status`, {
                     method: "GET",
@@ -269,9 +283,10 @@
             }
         }
 
-        // Panggil status server & cek session saat halaman dimuat
-        document.addEventListener("DOMContentLoaded", () => {
-            checkServerStatus();
+        // INITIALIZATION
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initServerUrl(); // Ambil URL aktif dari GSheet dulu
+            checkServerStatus();   // Baru cek koneksi server
 
             if (sessionStorage.getItem("loggedInUser")) {
                 window.location.href = "index.html";

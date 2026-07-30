@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QRIS MALAM - SECRET WARS</title>
 
-    <!-- CSS Utama (Sudah Mencakup Seluruh Style) -->
+    <!-- CSS Utama -->
     <link rel="stylesheet" href="styles.css">
 
     <!-- Library Html2Canvas untuk Render Gambar HD -->
@@ -15,7 +15,7 @@
 <body>
 
     <div class="layout-container">
-        <!-- Area Sidebar (Di-render otomatis oleh sidebarv2.js) -->
+        <!-- Area Sidebar -->
         <div class="sidebar"></div>
 
         <div class="main-content">
@@ -39,7 +39,6 @@
                 <div class="toolbar">
                     <div class="toolbar-group">
                         <span class="toolbar-label">PIC:</span>
-                        <!-- Input dikunci (readonly) & styling emas agar rapi -->
                         <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
                     </div>
 
@@ -48,7 +47,7 @@
                     <button class="copy" onclick="copyImage()">📋 Copy Image</button>
                 </div>
 
-                <!-- Grid Ringkasan SC vs WP (Default 0 Saat Refresh) -->
+                <!-- Grid Ringkasan SC vs WP -->
                 <div class="info-bar">
                     <div class="info-card">
                         <div class="info-label" style="border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 8px;">#QRIS CPANEL SC</div>
@@ -75,7 +74,7 @@
                     </div>
                 </div>
 
-                <!-- Banner Status Dashboard (DEFAULT MENUNGGU CROSSCHECK) -->
+                <!-- Banner Status Dashboard -->
                 <div id="statusBanner" class="hero-banner" style="display: flex; justify-content: center; text-align: center; font-weight: 800; font-size: 15px; margin-top: 4px;">
                     MENUNGGU CROSSCHECK
                 </div>
@@ -84,7 +83,7 @@
         </div>
     </div>
 
-    <!-- POPUP LOADING LAZY LOAD ANIMATED (KERETA UAP WIDE) -->
+    <!-- POPUP LOADING -->
     <div id="loadingModal">
         <div class="loading-card">
             <img src="assets/loading-train.svg" alt="Loading Kereta">
@@ -93,7 +92,7 @@
         </div>
     </div>
 
-    <!-- POPUP CUSTOM NOTIFIKASI DI TENGAH -->
+    <!-- POPUP CUSTOM NOTIFIKASI -->
     <div id="customAlertModal">
         <div class="alert-card">
             <div class="alert-icon" id="alertIcon">✅</div>
@@ -125,7 +124,7 @@
     <!-- Toast Notification -->
     <div id="customToast">Gambar Berhasil Disalin ke Clipboard!</div>
 
-    <!-- ================= AREA TEMPLATE LAPORAN HD (1920x1080) ================= -->
+    <!-- AREA TEMPLATE LAPORAN HD (1920x1080) -->
     <div id="reportArea">
         <div class="rep-header">
             <div class="rep-topbar">
@@ -138,7 +137,6 @@
         </div>
 
         <div class="rep-content">
-            <!-- Kartu Speedcash & Winpay -->
             <div class="rep-cards">
                 <div class="rep-card">
                     <div class="rep-card-title">SPEEDCASH</div>
@@ -169,7 +167,6 @@
                 </div>
             </div>
 
-            <!-- Box Selisih SC vs WP -->
             <div class="rep-diff-box">
                 <div class="rep-diff-item">
                     <div class="rep-diff-title">
@@ -193,7 +190,6 @@
                 </div>
             </div>
 
-            <!-- Box Validasi & Legenda Aturan -->
             <div class="rep-validation-layout">
                 <div class="rep-val-left" id="repValLeftBox">
                     <div class="rep-status-head">
@@ -234,9 +230,8 @@
                 </div>
             </div>
 
-            <!-- Footer Laporan -->
             <div class="rep-footer" id="repFooterText">
-                LAPORAN INI DIHASILKAN OTOMATIS DARI SISTEM QRIS MONITORING | REPORT BY : PUTRA
+                LAPORAN INI DIHASILKAN OTOMATIS DARI SISTEM QRIS MONITORING
             </div>
         </div>
     </div>
@@ -244,7 +239,24 @@
     <!-- Script External & Logika Sistem -->
     <script src="sidebarv2.js"></script>
     <script>
-        const SERVER_URL = "http://192.168.1.50:5000"; 
+        // URL GOOGLE APPS SCRIPT
+        const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
+        let SERVER_URL = "http://localhost:5000"; // Fallback default
+
+        // AMBIL DYNAMIC SERVER URL DARI GSHEET CONFIG
+        async function initServerUrl() {
+            try {
+                const res = await fetch(`${CASE_SCRIPT_URL}?action=get_server_url`);
+                const data = await res.json();
+                if (data.status === "success" && data.server_url) {
+                    SERVER_URL = data.server_url;
+                    console.log("🌐 Dynamic SERVER_URL Terhubung:", SERVER_URL);
+                }
+            } catch (err) {
+                console.warn("⚠️ Gagal mengambil Dynamic SERVER_URL, memakai fallback localhost.");
+            }
+        }
+
         let selectedPeriode = "1";
         let generatedCanvasBlob = null;
 
@@ -309,7 +321,8 @@
         }
 
         function updateReportHeader() {
-            const pic = document.getElementById("pic").value;
+            const picInput = document.getElementById("pic");
+            const pic = picInput ? picInput.value : (sessionStorage.getItem("loggedInUser") || "OPERATOR");
             const cutOff = cutOffLabels[selectedPeriode] || "23.00";
             const dateStr = document.getElementById('reportTimeInfo').dataset.dateStr || '-';
             
@@ -330,8 +343,7 @@
                 const res = await fetch(`${SERVER_URL}/api/trigger-qris`, { 
                     method: 'POST',
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': 'true' 
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ periode: selectedPeriode })
                 });
@@ -356,9 +368,7 @@
 
         async function loadReportData() {
             try {
-                const res = await fetch(`${SERVER_URL}/api/get-qris-data`, {
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
+                const res = await fetch(`${SERVER_URL}/api/get-qris-data`);
                 const data = await res.json();
 
                 if (data.report_date && data.report_time) {
@@ -376,7 +386,7 @@
                 const selisihNominal = Math.abs(nominalSC - nominalWP);
                 const persenSelisih = nominalSC > 0 ? (selisihNominal / nominalSC) * 100 : 0;
 
-                // 1. Update Dashboard Web Utama
+                // Update Dashboard Web
                 document.getElementById('trxSC').innerText = trxSC.toLocaleString('id-ID');
                 document.getElementById('nominalSC').innerText = formatRupiahShort(nominalSC);
                 document.getElementById('trxWP').innerText = trxWP.toLocaleString('id-ID');
@@ -385,7 +395,7 @@
                 const statusBanner = document.getElementById('statusBanner');
                 statusBanner.innerText = data.status_message || 'MASIH DALAM KATEGORI "AMAN" / WAJAR';
 
-                // 2. Update Template Gambar HD (#reportArea)
+                // Update Template Gambar HD (#reportArea)
                 document.getElementById('repB4').innerText = trxSC.toLocaleString('id-ID');
                 document.getElementById('repB5').innerText = formatRupiahHD(nominalSC);
                 document.getElementById('repB8').innerText = trxWP.toLocaleString('id-ID');
@@ -395,7 +405,6 @@
                 document.getElementById('repSelisihNominal').innerText = formatRupiahHD(selisihNominal);
                 document.getElementById('repPersentase').innerText = persenSelisih.toFixed(2) + '%';
 
-                // Logika Status Validasi
                 const valLeftBox = document.getElementById('repValLeftBox');
                 const statusIcon = document.getElementById('repStatusIcon');
                 const statusText = document.getElementById('repStatusText');
@@ -431,7 +440,6 @@
             }
         }
 
-        /* Logika Render & Copy Gambar HD 1920x1080 (Solid Background) */
         async function prepareCanvasBlob() {
             updateReportHeader();
             const area = document.getElementById("reportArea");
@@ -496,6 +504,11 @@
             closePreviewModal();
             await copyImage();
         }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initServerUrl();
+            loadReportData();
+        });
     </script>
 </body>
 </html>

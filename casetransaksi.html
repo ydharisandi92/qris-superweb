@@ -221,8 +221,8 @@
                 <!-- SUB MENU 2: ALL CASES -->
                 <div id="allCasesTab" class="tab-content">
                     <div class="card-box">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                                 <h3 style="margin: 0; color: var(--accent-gold); font-size: 15px;">📊 REKAPITULASI CASE</h3>
                                 <div style="display: flex; gap: 6px;">
                                     <button id="btnFilterAll" class="filter-btn active" onclick="filterCases('ALL', this)">ALL (0)</button>
@@ -231,6 +231,11 @@
                                 </div>
                             </div>
                             <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="loadAllCasesFromGSheet(true)">⟳ Refresh Data</button>
+                        </div>
+
+                        <!-- INPUT SEARCH BARU (FITUR PENCARIAN REALTIME) -->
+                        <div style="margin-bottom: 16px;">
+                            <input type="text" id="inputSearchCases" class="search-input" placeholder="🔍 Cari ID Transaksi, ID Pelanggan, Kendala, PIC, SN, Catatan..." oninput="renderCasesTable()">
                         </div>
 
                         <div style="overflow-x: auto;">
@@ -261,7 +266,7 @@
         </div>
     </div>
 
-    <!-- POPUP 1: DETAIL CASE & UPDATE CASE (DESAIN MENYAMPING / LANDSCAPE 2 PANEL) -->
+    <!-- POPUP 1: DETAIL CASE & UPDATE CASE -->
     <div id="caseDetailModal" class="modal-overlay" style="display: none;">
         <div class="modal-box" style="width: 920px; max-width: 95vw; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">
@@ -269,7 +274,6 @@
                 <span id="detailStatusBadge" class="badge-status badge-pending">PENDING</span>
             </div>
 
-            <!-- LAYOUT DESAIN MENYAMPING (2 PANEL GRID) -->
             <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; align-items: start;">
 
                 <!-- PANEL KIRI: DATA TRANSAKSI -->
@@ -372,7 +376,24 @@
     <!-- SCRIPT UTAMA -->
     <script src="sidebarv2.js"></script>
     <script>
-        const SERVER_URL = "http://192.168.1.50:5000";
+        // URL GOOGLE APPS SCRIPT
+        const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
+        let SERVER_URL = "http://localhost:5000"; // Fallback default
+
+        // AMBIL DYNAMIC SERVER URL DARI GSHEET CONFIG
+        async function initServerUrl() {
+            try {
+                const res = await fetch(`${CASE_SCRIPT_URL}?action=get_server_url`);
+                const data = await res.json();
+                if (data.status === "success" && data.server_url) {
+                    SERVER_URL = data.server_url;
+                    console.log("🌐 Dynamic SERVER_URL Terhubung:", SERVER_URL);
+                }
+            } catch (err) {
+                console.warn("⚠️ Gagal mengambil Dynamic SERVER_URL, memakai fallback localhost.");
+            }
+        }
+
         let currentFetchedData = null;
         let rawAllCases = [];
         let currentFilteredCases = [];
@@ -545,16 +566,47 @@
             renderCasesTable();
         }
 
+        // LOGIKA RENDER TABEL TERMASUK FILTER STATUS & PENCARIAN
         function renderCasesTable() {
             const tbody = document.getElementById("allCasesTableBody");
-            currentFilteredCases = rawAllCases;
+            const searchInput = document.getElementById("inputSearchCases");
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
+            // 1. Filter berdasarkan Status Button (ALL / PENDING / SOLVED)
+            currentFilteredCases = rawAllCases;
             if (currentFilter !== "ALL") {
                 currentFilteredCases = rawAllCases.filter(c => (c.case_status || "PENDING").toUpperCase() === currentFilter);
             }
 
+            // 2. Filter berdasarkan Kata Kunci Pencarian (Jika ada)
+            if (query !== "") {
+                currentFilteredCases = currentFilteredCases.filter(item => {
+                    const trxId = String(item.id_transaksi || "").toLowerCase();
+                    const prodId = String(item.id_produk || "").toLowerCase();
+                    const bill1 = String(item.bill_info1 || "").toLowerCase();
+                    const bill2 = String(item.bill_info2 || "").toLowerCase();
+                    const kendala = String(item.kendala || "").toLowerCase();
+                    const followUp = String(item.follow_up || "").toLowerCase();
+                    const pic = String(item.pic || "").toLowerCase();
+                    const sn = String(item.sn || "").toLowerCase();
+                    const catatan = String(item.catatan || "").toLowerCase();
+                    const updateCase = String(item.update_case || "").toLowerCase();
+
+                    return trxId.includes(query) ||
+                           prodId.includes(query) ||
+                           bill1.includes(query) ||
+                           bill2.includes(query) ||
+                           kendala.includes(query) ||
+                           followUp.includes(query) ||
+                           pic.includes(query) ||
+                           sn.includes(query) ||
+                           catatan.includes(query) ||
+                           updateCase.includes(query);
+                });
+            }
+
             if (currentFilteredCases.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">Tidak ada data case (${currentFilter}).</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">Tidak ada data case yang cocok.</td></tr>`;
                 return;
             }
 
@@ -649,7 +701,8 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initServerUrl();
             loadTaglistsFromGSheet();
             loadAllCasesFromGSheet();
         });
