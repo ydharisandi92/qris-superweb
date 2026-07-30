@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // 5. HEARTBEAT & SYNC USERS (DENGAN DYNAMIC SERVER_URL)
+    // 5. HEARTBEAT & SYNC USERS (WITH AUTO-RECONNECT)
     async function syncActiveUsers() {
         const serverBadge = document.getElementById("server-status-badge");
 
@@ -279,15 +279,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         } catch (e) {
             if (serverBadge) {
                 serverBadge.className = "server-status-badge offline";
-                serverBadge.innerText = "SERVER: OFFLINE 🔴";
+                serverBadge.innerText = "CONNECTING... 🟡";
             }
+            // AUTO-RECONNECT: Mencoba mengambil URL tunnel terbaru dari GSheet secara otomatis jika koneksi terputus
+            console.warn("⚠️ Koneksi terputus. Mengambil URL tunnel terbaru dari GSheet...");
+            await initServerUrl();
         }
     }
 
     // INITIALIZATION DYNAMIC URL & HEARTBEAT LOOP
-    await initServerUrl(); // Ambil URL server aktif dulu
-    syncActiveUsers();     // Panggil heartbeat pertama kali
-    setInterval(syncActiveUsers, 5000); // Loop per 5 detik
+    await initServerUrl(); 
+    syncActiveUsers();     
+    setInterval(syncActiveUsers, 5000); 
 
     window.logoutUser = async function () {
         try {
