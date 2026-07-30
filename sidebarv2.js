@@ -1,6 +1,23 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const currentUser = sessionStorage.getItem("loggedInUser") || "GUEST";
-    const SERVER_URL = "http://localhost:5000";
+    
+    // URL GOOGLE APPS SCRIPT & DYNAMIC SERVER URL
+    const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
+    let SERVER_URL = "http://localhost:5000"; // Fallback default
+
+    // FUNGSI MENGAMBIL DYNAMIC SERVER URL DARI GSHEET
+    async function initServerUrl() {
+        try {
+            const res = await fetch(`${CASE_SCRIPT_URL}?action=get_server_url`);
+            const data = await res.json();
+            if (data.status === "success" && data.server_url) {
+                SERVER_URL = data.server_url;
+                console.log("🌐 Sidebar Dynamic SERVER_URL Terhubung:", SERVER_URL);
+            }
+        } catch (err) {
+            console.warn("⚠️ Sidebar gagal mengambil Dynamic SERVER_URL, memakai fallback.");
+        }
+    }
 
     // 1. OTOMATIS SUNTIKKAN CSS KE DALAM HALAMAN
     const styleID = "dynamic-sidebar-style";
@@ -219,7 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 5. HEARTBEAT & SYNC USERS
+    // 5. HEARTBEAT & SYNC USERS (DENGAN DYNAMIC SERVER_URL)
     async function syncActiveUsers() {
         const serverBadge = document.getElementById("server-status-badge");
 
@@ -267,8 +284,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    syncActiveUsers();
-    setInterval(syncActiveUsers, 5000);
+    // INITIALIZATION DYNAMIC URL & HEARTBEAT LOOP
+    await initServerUrl(); // Ambil URL server aktif dulu
+    syncActiveUsers();     // Panggil heartbeat pertama kali
+    setInterval(syncActiveUsers, 5000); // Loop per 5 detik
 
     window.logoutUser = async function () {
         try {
