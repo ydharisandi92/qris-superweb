@@ -53,7 +53,24 @@ button:hover { transform: translateY(-1px); }
 .loading { text-align: center; padding: 10px; font-weight: bold; color: #38bdf8; font-size: 13px; }
 
 /* ================= CARDS & DASHBOARD MENU ================= */
-.hero-banner { background: #1e293b; border-radius: 10px; padding: 24px 28px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); border-bottom: 4px solid var(--accent-gold); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); }
+.hero-banner { 
+    background: #1e293b; 
+    border-radius: 10px; 
+    padding: 24px 28px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border: 1px solid var(--border-color); 
+    border-bottom: 4px solid var(--accent-gold); 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); 
+    gap: 20px;
+}
+.hero-banner img { 
+    max-height: 80px !important; 
+    width: auto !important; 
+    object-fit: contain !important; 
+    flex-shrink: 0; 
+}
 .hero-text h1 { margin: 0 0 4px 0; font-size: 24px; font-weight: 800; color: #ffffff; }
 .hero-subtitle { margin: 0; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
 .refresh-quote-btn { background: transparent; color: var(--accent-gold); padding: 0; margin-top: 8px; font-size: 12px; }
@@ -127,16 +144,177 @@ table.main-data-table td { padding: 5px 3px; font-size: 10.5px; border: 1px soli
 .server-status-badge.online { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
 .server-status-badge.offline { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
 
-/* ================= TEMPLATE LAPORAN HD QRIS MALAM (#reportArea) ================= */
+/* ================= TEMPLATE LAPORAN HD STANDARD (CB / DOMESTIK / PERIODIK) ================= */
 #reportArea { 
     position: absolute; 
     left: -9999px; 
     top: -9999px; 
+    width: 1650px; 
+    background: #ffffff; 
+    color: #1f2937; 
+    box-sizing: border-box;
+}
+
+#reportArea .header { 
+    background: linear-gradient(135deg, #002f87 10%, #1565c0 50%, #ff8f00 100%) !important; 
+    padding: 25px 30px !important; 
+    color: #ffffff !important; 
+    border-bottom: 4px solid #38bdf8 !important; 
+}
+#reportArea .header-table { 
+    width: 100% !important; 
+    border-collapse: collapse !important; 
+    background: transparent !important; 
+}
+#reportArea .header-table td { 
+    border: none !important; 
+    padding: 0 !important; 
+    background: transparent !important; 
+    vertical-align: middle !important; 
+}
+#reportArea .qris-logo-img { 
+    height: 60px !important; 
+    width: auto !important; 
+    object-fit: contain !important;
+    filter: brightness(0) invert(1) !important;
+}
+#reportArea .hero-logo-box { 
+    display: flex !important; 
+    justify-content: flex-end !important; 
+    align-items: center !important; 
+    width: 100% !important; 
+}
+#reportArea .hero-logo-box img { 
+    height: 95px !important; 
+    width: auto !important; 
+    object-fit: contain !important; 
+    filter: brightness(0) invert(1) !important; 
+}
+#reportArea .main-title { 
+    margin: 10px 0 0 0 !important; 
+    font-size: 50px !important; 
+    font-weight: 800 !important; 
+    text-align: center !important; 
+    color: #ffffff !important; 
+    text-transform: uppercase !important;
+}
+#reportArea .subtitle { 
+    margin-top: 6px !important; 
+    font-size: 22px !important; 
+    font-weight: bold !important; 
+    text-align: center !important; 
+    color: #ffffff !important;
+    text-transform: uppercase !important; 
+}
+#reportArea .subtitle-pic { 
+    margin-top: 8px !important; 
+    font-size: 18px !important; 
+    font-weight: bold !important; 
+    text-align: center !important; 
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+}
+
+#reportArea .content { 
+    padding: 25px !important; 
+    background: #ffffff !important; 
+}
+#reportArea .unified-summary-card { 
+    background: #ffffff !important; 
+    border: 1px solid #cfcfcf !important; 
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    margin-bottom: 25px !important;
+}
+#reportArea .unified-summary-header { 
+    font-size: 19px !important; 
+    padding: 12px !important; 
+    background: linear-gradient(135deg, #002f87 0%, #1565c0 50%, #ff8f00 100%) !important; 
+    color: #ffffff !important; 
+    font-weight: 800 !important; 
+    text-align: center !important;
+}
+#reportArea .matrix-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+}
+#reportArea .matrix-table th { 
+    font-size: 16px !important; 
+    padding: 10px 6px !important; 
+    background: #f1f5f9 !important; 
+    color: #1e3a8a !important; 
+    border: 1px solid #cfcfcf !important; 
+    text-align: center !important; 
+    font-weight: 800 !important; 
+}
+#reportArea .matrix-table th.nominal-th { 
+    color: #b45309 !important; 
+    background: #fef3c7 !important; 
+}
+#reportArea .matrix-table td { 
+    font-size: 17px !important; 
+    padding: 12px 6px !important; 
+    background: #ffffff !important; 
+    color: #111827 !important; 
+    border: 1px solid #cfcfcf !important; 
+    text-align: center !important; 
+    font-weight: 800 !important; 
+}
+#reportArea .label-cell { 
+    font-size: 14px !important; 
+    text-align: center !important; 
+    padding-left: 0 !important; 
+    font-weight: 800 !important; 
+    background: #f3f4f6 !important; 
+    color: #111827 !important; 
+}
+#reportArea .main-tables-grid { 
+    display: grid !important; 
+    grid-template-columns: 1fr 1fr !important; 
+    gap: 25px !important; 
+    align-items: start !important; 
+}
+#reportArea .section-title { 
+    font-size: 17px !important; 
+    min-height: 35px !important; 
+    display: flex !important; 
+    align-items: center !important; 
+    color: #1565c0 !important; 
+    font-weight: 800 !important;
+}
+#reportArea table.main-data-table { 
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background: #ffffff !important; 
+    border: 1px solid #cfcfcf !important; 
+}
+#reportArea table.main-data-table th { 
+    padding: 12px 4px !important; 
+    font-size: 13px !important; 
+    background: #1565c0 !important; 
+    color: #ffffff !important; 
+    border: 1px solid #cfcfcf !important; 
+    text-transform: uppercase !important;
+    text-align: center !important;
+}
+#reportArea table.main-data-table.right-theme th { 
+    background: #ff8f00 !important; 
+}
+#reportArea table.main-data-table td { 
+    padding: 10px 4px !important; 
+    font-size: 14px !important; 
+    background: #ffffff !important; 
+    color: #111827 !important; 
+    border: 1px solid #cfcfcf !important; 
+    text-align: center !important;
+}
+
+/* ================= TEMPLATE LAPORAN HD QRIS MALAM ================= */
+#reportArea:has(.rep-header) { 
     width: 1920px !important; 
     height: 1080px !important; 
     background: #f0f5fc !important; 
-    color: #1f2937; 
-    box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
