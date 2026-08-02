@@ -69,6 +69,7 @@
                         <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
                     </div>
 
+                    <button class="generate" onclick="openGoogleSheet()">GSheet</button>
                     <button class="generate" onclick="generateReport()">Generate Report</button>
                     <button class="preview-btn" onclick="openPreviewModal()">Preview Image</button>
                     <button class="copy" onclick="copyImage()">Copy Image</button>
@@ -210,6 +211,10 @@
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0
             }).format(num);
+        }
+
+        function openGoogleSheet() {
+            window.open("https://docs.google.com/spreadsheets/d/1ESHhGJY32qC7fSFLx8HoDwGdYu2XA94mCPFEkTQCp0w/edit?gid=0#gid=0", "_blank", "noopener,noreferrer");
         }
 
         function renderInitialTables() {

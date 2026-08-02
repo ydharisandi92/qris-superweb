@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PENGECEKAN QRIS H+0 - RANGER+ Monitoring System</title>
 
-    <!-- CSS Eksternal (Pastikan file styles.css satu folder dengan file ini) -->
+    <!-- CSS Eksternal -->
     <link rel="stylesheet" href="styles.css">
 
     <!-- Library External untuk Render Gambar -->
@@ -38,7 +38,7 @@
     </div>
 
     <div class="layout-container">
-        <!-- Area Sidebar (Di-load dari sidebarv2.js) -->
+        <!-- Area Sidebar -->
         <div class="sidebar"></div>
 
         <div class="main-content">
@@ -56,10 +56,10 @@
 
                     <div class="toolbar-group">
                          <span class="toolbar-label">PIC:</span>
-                        <!-- Input dikunci (readonly) & styling emas agar rapi -->
                         <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
                     </div>
 
+                    <button class="generate" onclick="openGoogleSheet()">GSheet</button>
                     <button class="generate" onclick="generateReport()">Generate Report</button>
                     <button class="preview-btn" onclick="openPreviewModal()">Preview Image</button>
                     <button class="copy" onclick="copyImage()">Copy Image</button>
@@ -77,15 +77,15 @@
                         <table class="matrix-table">
                             <thead>
                                 <tr>
-                                    <th rowspan="2" style="width: 14%; vertical-align: middle;">Status</th>
-                                    <th colspan="2" style="width: 43%;">Volume Transaksi (Qty)</th>
-                                    <th colspan="2" style="width: 43%;" class="nominal-th">Nominal Transaksi (IDR)</th>
+                                    <th rowspan="2" style="width: 14%; vertical-align: middle; text-align: center; font-weight: 800;">Status</th>
+                                    <th colspan="2" style="width: 43%; text-align: center; font-weight: 800;">Volume Transaksi (Qty)</th>
+                                    <th colspan="2" style="width: 43%; text-align: center; font-weight: 800;" class="nominal-th">Nominal Transaksi (IDR)</th>
                                 </tr>
                                 <tr>
-                                    <th>Data Recon VS Data Transaksi</th>
-                                    <th>Data Transaksi VS Data Recon</th>
-                                    <th class="nominal-th">Data Recon VS Data Transaksi</th>
-                                    <th class="nominal-th">Data Transaksi VS Data Recon</th>
+                                    <th style="text-align: center; font-weight: 800;">Data Recon VS Data Transaksi</th>
+                                    <th style="text-align: center; font-weight: 800;">Data Transaksi VS Data Recon</th>
+                                    <th style="text-align: center; font-weight: 800;" class="nominal-th">Data Recon VS Data Transaksi</th>
+                                    <th style="text-align: center; font-weight: 800;" class="nominal-th">Data Transaksi VS Data Recon</th>
                                 </tr>
                             </thead>
                             <tbody id="webUnifiedMatrixBody"></tbody>
@@ -142,13 +142,11 @@
                 <tr>
                     <td style="text-align:left; width:50%;">
                         <div class="logo-container-qris">
-                            <!-- LOGO QRIS LOKAL -->
                             <img class="qris-logo-img" src="assets/logo-qris.png" alt="Logo QRIS">
                         </div>
                     </td>
                     <td style="text-align:right; width:50%; vertical-align: middle;">
                         <div class="hero-logo-box">
-                            <!-- LOGO RANGER LOKAL -->
                             <img src="assets/logo-ranger.png" alt="Logo RANGER+">
                         </div>
                     </td>
@@ -170,15 +168,15 @@
                 <table class="matrix-table">
                     <thead>
                         <tr>
-                            <th rowspan="2" style="width: 14%; vertical-align: middle;">Status</th>
-                            <th colspan="2" style="width: 43%;">Volume Transaksi (Qty)</th>
-                            <th colspan="2" style="width: 43%;" class="nominal-th">Nominal Transaksi (IDR)</th>
+                            <th rowspan="2" style="width: 14%; vertical-align: middle; text-align: center; font-weight: 800;">Status</th>
+                            <th colspan="2" style="width: 43%; text-align: center; font-weight: 800;">Volume Transaksi (Qty)</th>
+                            <th colspan="2" style="width: 43%; text-align: center; font-weight: 800;" class="nominal-th">Nominal Transaksi (IDR)</th>
                         </tr>
                         <tr>
-                            <th>Data Recon VS Data Transaksi</th>
-                            <th>Data Transaksi VS Data Recon</th>
-                            <th class="nominal-th">Data Recon VS Data Transaksi</th>
-                            <th class="nominal-th">Data Transaksi VS Data Recon</th>
+                            <th style="text-align: center; font-weight: 800;">Data Recon VS Data Transaksi</th>
+                            <th style="text-align: center; font-weight: 800;">Data Transaksi VS Data Recon</th>
+                            <th style="text-align: center; font-weight: 800;" class="nominal-th">Data Recon VS Data Transaksi</th>
+                            <th style="text-align: center; font-weight: 800;" class="nominal-th">Data Transaksi VS Data Recon</th>
                         </tr>
                     </thead>
                     <tbody id="unifiedMatrixBody"></tbody>
@@ -229,10 +227,7 @@
     <script src="shared.js"></script>
 
     <script>
-    // LINK API APPS SCRIPT JSON YANG BARU 
     const DATA_URL_BASE = "https://script.google.com/macros/s/AKfycbx17SozyrtjQF3nMD1Z4iiKRmYS1XL63rHlBG9IBkqEHinoHpZr5pdthUCI2_FqlSEO7w/exec";
-    
-    // SHEET_NAME kita abaikan agar sistem otomatis mengambil Sheet urutan pertama (paling kiri)
 
     const statusLabels = [
         { label: "📊 TOTAL", idx: 2 },
@@ -247,14 +242,18 @@
         return "14:00:00 - 16:59:59";
     }
 
+    function openGoogleSheet() {
+        window.open("https://docs.google.com/spreadsheets/d/1ESHhGJY32qC7fSFLx8HoDwGdYu2XA94mCPFEkTQCp0w/edit?gid=0#gid=0", "_blank", "noopener,noreferrer");
+    }
+
     function getRcStyleAndValue(val) {
         let cleanVal = String(val || '').trim();
         if (cleanVal === "0") {
-            return { text: "00", style: "style='background-color: #d1fae5; color: #065f46; font-weight: bold;'" };
+            return { text: "00", style: "style='background-color: #d1fae5; color: #065f46; font-weight: bold; text-align: center;'" };
         } else if (cleanVal === "68") {
-            return { text: "68", style: "style='background-color: #fee2e2; color: #991b1b; font-weight: bold;'" };
+            return { text: "68", style: "style='background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center;'" };
         }
-        return { text: cleanVal, style: "" };
+        return { text: cleanVal, style: "style='text-align: center;'" };
     }
 
     function renderInitialMatrices() {
@@ -263,19 +262,20 @@
         statusLabels.forEach(item => {
             let rowHTML = `
                 <tr id="row-status-${item.idx}">
-                    <td class="label-cell">${item.label}</td><td class="qty-1">-</td><td class="qty-2">-</td><td class="nom-1">-</td><td class="nom-2">-</td>
+                    <td class="label-cell" style="font-weight: 800; text-align: center;">${item.label}</td>
+                    <td class="qty-1" style="font-weight: 800; text-align: center;">-</td>
+                    <td class="qty-2" style="font-weight: 800; text-align: center;">-</td>
+                    <td class="nom-1" style="font-weight: 800; text-align: center;">-</td>
+                    <td class="nom-2" style="font-weight: 800; text-align: center;">-</td>
                 </tr>`;
             document.getElementById("webUnifiedMatrixBody").innerHTML += rowHTML;
             document.getElementById("unifiedMatrixBody").innerHTML += rowHTML;
         });
     }
 
-    // FUNGSI MEMANGGIL DATA DARI API YANG SUDAH DIPERBAIKI
     async function fetchSheetData() {
         const url = new URL(DATA_URL_BASE);
-        // Kita matikan parameter sheetName agar Apps Script otomatis mengambil Sheet ke-1
-        // url.searchParams.set('sheetName', SHEET_NAME); 
-        url.searchParams.set('cacheBust', Date.now()); // Mencegah cache
+        url.searchParams.set('cacheBust', Date.now());
 
         const response = await fetch(url.toString(), { redirect: 'follow' });
         
@@ -285,7 +285,6 @@
 
         const data = await response.json();
         
-        // Pengecekan error langsung dari Apps Script
         if (data.error) {
             throw new Error("Apps Script Error: " + data.error);
         }
@@ -318,13 +317,11 @@
             document.getElementById("webHasilBody").innerHTML = "";
             document.getElementById("webHasilKananBody").innerHTML = "";
 
-            // Eksekusi API
             const rawData = await fetchSheetData();
-            console.log("Data berhasil diambil:", rawData); // Cek isi data di Console Browser (F12)
+            console.log("Data berhasil diambil:", rawData);
 
             const rows = Array.isArray(rawData) ? rawData : (rawData.data || []);
 
-            // Jika tabel kosong, hentikan proses
             if (rows.length === 0) {
                 document.getElementById("loading").innerText = "Data berhasil diambil, tetapi isi tabel kosong.";
                 return;
@@ -353,12 +350,12 @@
                 
                 if (row[0] || row[1] || row[2]) {
                     let rcKiri = getRcStyleAndValue(row[4]);
-                    kiriHTML += `<tr><td>${row[0]||''}</td><td>${row[1]||''}</td><td>${row[2]||''}</td><td>${row[3]||''}</td><td ${rcKiri.style}>${rcKiri.text}</td><td>${row[5] ? formatCurrency(row[5]) : ''}</td></tr>`;
+                    kiriHTML += `<tr><td style="text-align: center;">${row[0]||''}</td><td style="text-align: center;">${row[1]||''}</td><td style="text-align: center;">${row[2]||''}</td><td style="text-align: center;">${row[3]||''}</td><td ${rcKiri.style}>${rcKiri.text}</td><td style="text-align: center;">${row[5] ? formatCurrency(row[5]) : ''}</td></tr>`;
                 }
                 if (row[7] || row[8] || row[9]) {
                     let ket = (String(row[3]).trim() === String(row[10]).trim() && String(row[2]).trim() === "0") ? "Sukses manual" : "";
                     let rcKanan = getRcStyleAndValue(row[11]);
-                    kananHTML += `<tr><td>${row[7]||''}</td><td>${row[8]||''}</td><td>${row[9]||''}</td><td>${row[10]||''}</td><td ${rcKanan.style}>${rcKanan.text}</td><td>${row[12] ? formatCurrency(row[12]) : ''}</td><td style="font-weight: bold; color: #ffffff;">${ket}</td></tr>`;
+                    kananHTML += `<tr><td style="text-align: center;">${row[7]||''}</td><td style="text-align: center;">${row[8]||''}</td><td style="text-align: center;">${row[9]||''}</td><td style="text-align: center;">${row[10]||''}</td><td ${rcKanan.style}>${rcKanan.text}</td><td style="text-align: center;">${row[12] ? formatCurrency(row[12]) : ''}</td><td style="font-weight: bold; color: #ffffff; text-align: center;">${ket}</td></tr>`;
                 }
             }
 
@@ -379,3 +376,5 @@
 
     renderInitialMatrices();
 </script>
+</body>
+</html>

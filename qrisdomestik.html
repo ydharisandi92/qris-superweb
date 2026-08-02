@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* CSS Rapat Khusus UI Web (Di-scoping ke .web-display-card agar #reportArea TETAP HD) */
+        /* CSS Rapat Khusus UI Web */
         .main-content { padding: 10px 14px !important; gap: 6px !important; }
         .wrapper { gap: 6px !important; }
         .main-title { margin: 0 0 4px 0 !important; font-size: 18px !important; }
@@ -25,8 +25,8 @@
         .web-display-card .web-header-preview p { font-size: 9.5px !important; margin: 1px 0 !important; }
         .web-display-card .unified-summary-card { margin-bottom: 6px !important; }
         .web-display-card .unified-summary-header { padding: 4px !important; font-size: 10.5px !important; }
-        .web-display-card .matrix-table th { padding: 3px 2px !important; font-size: 9.5px !important; }
-        .web-display-card .matrix-table td { padding: 2.5px 2px !important; font-size: 10px !important; }
+        .web-display-card .matrix-table th { padding: 3px 2px !important; font-size: 9.5px !important; text-align: center !important; font-weight: 800 !important; }
+        .web-display-card .matrix-table td { padding: 2.5px 2px !important; font-size: 10px !important; text-align: center !important; font-weight: 800 !important; }
         .web-display-card .web-tables-grid { gap: 8px !important; margin-bottom: 4px !important; }
         .web-display-card .section-title { font-size: 10px !important; margin-bottom: 3px !important; }
         .web-display-card table.main-data-table th { padding: 3px 2px !important; font-size: 9.5px !important; }
@@ -69,10 +69,10 @@
                 <div class="toolbar">
                     <div class="toolbar-group">
                         <span class="toolbar-label">PIC:</span>
-                        <!-- Input dikunci (readonly) & styling emas agar rapi -->
                         <input type="text" id="pic" readonly style="background: rgba(15, 23, 42, 0.8); color: #fbbf24; font-weight: 800; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 6px; width: 140px; text-align: center; cursor: not-allowed; outline: none;">
                     </div>
 
+                    <button class="generate" onclick="openGoogleSheet()">GSheet</button>
                     <button class="generate" onclick="generateReport()">Generate Report</button>
                     <button class="preview-btn" onclick="openPreviewModal()">Preview Image</button>
                     <button class="copy" onclick="copyImage()">Copy Image</button>
@@ -295,6 +295,10 @@
             }).format(num);
         }
 
+        function openGoogleSheet() {
+            window.open("https://docs.google.com/spreadsheets/d/1ESHhGJY32qC7fSFLx8HoDwGdYu2XA94mCPFEkTQCp0w/edit?gid=1910337504#gid=1910337504", "_blank", "noopener,noreferrer");
+        }
+
         function getRcStyleAndValue(val) {
             let cleanVal = String(val || '').trim();
             if (cleanVal === "0" || cleanVal === "00") {
@@ -309,8 +313,8 @@
             const createEmptyRows = () => {
                 return rowTitles.map((title, idx) => `
                     <tr>
-                        <td style="text-align: center;">${idx + 1}</td>
-                        <td class="label-cell">${title}</td>
+                        <td style="font-weight: 800; text-align: center;">${idx + 1}</td>
+                        <td class="label-cell" style="font-weight: 800; text-align: center;">${title}</td>
                         <td style="font-weight: 800; text-align: center;">-</td>
                         <td style="font-weight: 800; color: #10b981; text-align: center;">-</td>
                         <td style="font-weight: 800; color: #f59e0b; text-align: center;">-</td>
@@ -434,8 +438,8 @@
 
                 const qtyHTML = data.qty.map((item, idx) => `
                     <tr>
-                        <td style="text-align: center;">${idx + 1}</td>
-                        <td class="label-cell">${rowTitles[idx]}</td>
+                        <td style="font-weight: 800; text-align: center;">${idx + 1}</td>
+                        <td class="label-cell" style="font-weight: 800; text-align: center;">${rowTitles[idx]}</td>
                         <td style="font-weight: 800; text-align: center;">${item.total}</td>
                         <td style="font-weight: 800; color: #10b981; text-align: center;">${item.ok}</td>
                         <td style="font-weight: 800; color: #f59e0b; text-align: center;">${item.ok_refund}</td>
@@ -445,8 +449,8 @@
 
                 const nominalHTML = data.nominal.map((item, idx) => `
                     <tr>
-                        <td style="text-align: center;">${idx + 1}</td>
-                        <td class="label-cell">${rowTitles[idx]}</td>
+                        <td style="font-weight: 800; text-align: center;">${idx + 1}</td>
+                        <td class="label-cell" style="font-weight: 800; text-align: center;">${rowTitles[idx]}</td>
                         <td style="font-weight: 800; text-align: center;">${formatCurrencyIDR(item.total)}</td>
                         <td style="font-weight: 800; color: #10b981; text-align: center;">${formatCurrencyIDR(item.ok)}</td>
                         <td style="font-weight: 800; color: #f59e0b; text-align: center;">${formatCurrencyIDR(item.ok_refund)}</td>
@@ -458,11 +462,11 @@
                     let rcObj = getRcStyleAndValue(row.rc);
                     return `<tr>
                         <td style="text-align: center;">${row.no}</td>
-                        <td>${row.waktu}</td>
-                        <td>${row.idTrx}</td>
-                        <td>${row.idReff}</td>
+                        <td style="text-align: center;">${row.waktu}</td>
+                        <td style="text-align: center;">${row.idTrx}</td>
+                        <td style="text-align: center;">${row.idReff}</td>
                         <td ${rcObj.style}>${rcObj.text}</td>
-                        <td style="text-align: right;">${formatCurrencyIDR(row.nominal)}</td>
+                        <td style="text-align: center;">${formatCurrencyIDR(row.nominal)}</td>
                     </tr>`;
                 }).join('') : `<tr><td colspan="6" style="color: #94a3b8; text-align: center; padding: 6px;">Belum ada data detail</td></tr>`;
 
@@ -470,11 +474,11 @@
                     let rcObj = getRcStyleAndValue(row.rc);
                     return `<tr>
                         <td style="text-align: center;">${row.no}</td>
-                        <td>${row.waktu}</td>
-                        <td>${row.idTrx}</td>
-                        <td>${row.idReff}</td>
+                        <td style="text-align: center;">${row.waktu}</td>
+                        <td style="text-align: center;">${row.idTrx}</td>
+                        <td style="text-align: center;">${row.idReff}</td>
                         <td ${rcObj.style}>${rcObj.text}</td>
-                        <td style="text-align: right;">${formatCurrencyIDR(row.nominal)}</td>
+                        <td style="text-align: center;">${formatCurrencyIDR(row.nominal)}</td>
                     </tr>`;
                 }).join('') : `<tr><td colspan="6" style="color: #94a3b8; text-align: center; padding: 6px;">Belum ada data detail</td></tr>`;
 

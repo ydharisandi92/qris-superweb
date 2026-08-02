@@ -67,6 +67,60 @@
         .form-group input:focus {
             border-color: #3b82f6;
         }
+
+        /* FIX PERBAIKAN POSISI PASSWORD WRAPPER & TOMBOL TOGGLE */
+        .password-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .password-wrapper input {
+            display: block !important;
+            width: 100% !important;
+            padding-right: 42px !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+        }
+        .toggle-password-btn {
+            position: absolute !important;
+            right: 8px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 30px !important;
+            height: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: none !important;
+            background: transparent !important;
+            font-size: 16px !important;
+            line-height: 1 !important;
+            cursor: pointer !important;
+            border-radius: 6px !important;
+            user-select: none !important;
+            box-sizing: border-box !important;
+            z-index: 5 !important;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
+            transition: background 0.2s ease !important;
+        }
+        .toggle-password-btn:hover {
+            background: rgba(148, 163, 184, 0.15) !important;
+        }
+
+        .capslock-warning {
+            display: none;
+            margin-top: 8px;
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        .capslock-warning.show {
+            display: block;
+        }
         .btn-login {
             width: 100%;
             padding: 12px;
@@ -172,7 +226,11 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Masukkan password..." required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Masukkan password..." required>
+                    <button type="button" class="toggle-password-btn" id="togglePasswordBtn" aria-label="Tampilkan password">🙉</button>
+                </div>
+                <div id="capslockWarning" class="capslock-warning" aria-live="polite">⚠️ Caps Lock aktif</div>
             </div>
 
             <button type="submit" class="btn-login" id="btnLogin">MASUK SEKARANG 🚀</button>
@@ -245,6 +303,25 @@
             }
         }
 
+        // FUNGSI TOGGLE PASSWORD (MENGGUNAKAN 🙉 DAN 🙈)
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById("password");
+            const toggleBtn = document.getElementById("togglePasswordBtn");
+            const isHidden = passwordInput.type === "password";
+
+            passwordInput.type = isHidden ? "text" : "password";
+            toggleBtn.textContent = isHidden ? "🙈" : "🙉";
+            toggleBtn.setAttribute("aria-label", isHidden ? "Sembunyikan password" : "Tampilkan password");
+        }
+
+        function updateCapsLockWarning(event) {
+            const warning = document.getElementById("capslockWarning");
+            if (!event || typeof event.getModifierState !== "function") return;
+
+            const isCapsOn = event.getModifierState("CapsLock");
+            warning.classList.toggle("show", isCapsOn);
+        }
+
         // 2. FUNGSI HANDLE LOGIN VIA API SERVER LOKAL
         async function handleLogin(event) {
             event.preventDefault();
@@ -285,6 +362,15 @@
 
         // INITIALIZATION
         document.addEventListener("DOMContentLoaded", async () => {
+            const passwordInput = document.getElementById("password");
+            const toggleBtn = document.getElementById("togglePasswordBtn");
+            const warning = document.getElementById("capslockWarning");
+
+            toggleBtn.addEventListener("click", togglePasswordVisibility);
+            passwordInput.addEventListener("keydown", updateCapsLockWarning);
+            passwordInput.addEventListener("keyup", updateCapsLockWarning);
+            passwordInput.addEventListener("blur", () => warning.classList.remove("show"));
+
             await initServerUrl(); // Ambil URL aktif dari GSheet dulu
             checkServerStatus();   // Baru cek koneksi server
 
