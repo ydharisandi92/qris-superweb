@@ -156,6 +156,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       <a href="qrisdomestik.html" class="nav-item" data-page="qrisdomestik.html">QRIS DOMESTIK H+1</a>
       <a href="qrismalam.html" class="nav-item" data-page="qrismalam.html">QRIS MALAM</a>
       <a href="casetransaksi.html" class="nav-item" data-page="casetransaksi.html">🔍 CASE TRANSAKSI</a>
+      <a href="validasipulsa.html" class="nav-item" data-page="validasipulsa.html">📱 VALIDASI PULSA</a>
     </div>
 
     <div class="sidebar-footer">
