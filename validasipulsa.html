@@ -9,21 +9,11 @@
     <link rel="stylesheet" href="styles.css">
 
     <style>
-        /* CSS Ringkas Bebas Scroll */
-        body {
-            overflow-y: hidden; /* Cegah scrollbar utama */
-        }
-        .main-content {
-            padding: 12px 16px !important;
-        }
-        .wrapper {
-            max-width: 100%;
-        }
-        .main-title {
-            font-size: 18px !important;
-            margin-bottom: 8px !important;
-            margin-top: 0 !important;
-        }
+        body { overflow-y: hidden; }
+        .main-content { padding: 12px 16px !important; }
+        .wrapper { max-width: 100%; }
+        .main-title { font-size: 18px !important; margin-bottom: 8px !important; margin-top: 0 !important; }
+        
         .val-card-search {
             background: #1e293b;
             border: 1px solid var(--border-color);
@@ -79,9 +69,7 @@
             box-sizing: border-box;
             outline: none;
         }
-        .val-input:focus, .val-select:focus, .val-textarea:focus {
-            border-color: #3b82f6;
-        }
+        .val-input:focus, .val-select:focus, .val-textarea:focus { border-color: #3b82f6; }
         .val-btn {
             padding: 8px 12px;
             border-radius: 5px;
@@ -97,7 +85,6 @@
         .val-btn-green { background: #059669; color: #fff; }
         .val-btn-green:hover { background: #10b981; }
         
-        /* Teks Box Balasan Mitra Warna Putih */
         .report-output {
             background: #0f172a;
             color: #ffffff;
@@ -108,21 +95,94 @@
             min-height: 260px;
             resize: none;
         }
+
+        /* MODAL POPUP SELEKSI TRANSAKSI */
+        #selectTrxModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+        }
+        .trx-modal-card {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 750px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .trx-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .trx-table th {
+            background: #0f172a;
+            color: #fbbf24;
+            font-size: 11px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            text-transform: uppercase;
+        }
+        .trx-table td {
+            font-size: 11px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            text-align: center;
+        }
+        .trx-row-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+        }
+
+        /* STYLING NOTIFIKASI TOAST MELAYANG */
+        #customToast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 999999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform: translateY(-15px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #customToast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        #customToast.error {
+            background: #ef4444;
+        }
     </style>
 </head>
 <body>
 
-    <!-- LAYOUT CONTAINER UTAMA -->
+    <!-- NOTIFIKASI TOAST MELAYANG -->
+    <div id="customToast"></div>
+
     <div class="layout-container">
-        
-        <!-- Sidebar Container -->
         <div class="sidebar"></div>
 
-        <!-- Main Content Area -->
         <div class="main-content">
             <div class="wrapper">
                 
-                <!-- Title Header -->
                 <h1 class="main-title" style="color: #fbbf24; display: flex; align-items: center; gap: 6px;">
                     📱 GENERATOR VALIDASI MITRA
                 </h1>
@@ -132,7 +192,6 @@
                     <form onsubmit="handleQueryValidation(event)" style="display: flex; gap: 10px; align-items: flex-end;">
                         <div class="val-input-group" style="flex: 1;">
                             <label class="val-label">CARI DATA TRANSAKSI AUTOMATIS (BILL INFO 1 / NO. HP)</label>
-                            <!-- KUNCI INPUT HANYA NUMERIK (ANGKA) -->
                             <input type="text" id="billInfoInput" class="val-input" required 
                                 inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 placeholder="Masukkan No. HP / ID Pelanggan (Contoh: 083803760408)">
@@ -143,9 +202,7 @@
                     </form>
                 </div>
 
-                <!-- Main Form & Result Grid -->
                 <div class="val-grid">
-                    
                     <!-- PANEL INPUT PARAMETER -->
                     <div class="val-card">
                         <h2 class="val-card-title">⚙️ Parameter Validasi</h2>
@@ -163,12 +220,10 @@
 
                         <div class="val-input-group">
                             <label class="val-label">2. NO. HP / ID PELANGGAN</label>
-                            <!-- KUNCI INPUT HANYA NUMERIK (ANGKA) -->
                             <input type="text" id="noHpInput" class="val-input" oninput="this.value = this.value.replace(/[^0-9]/g, ''); handleGenerate();"
                                 inputmode="numeric" placeholder="Contoh: 085602887010 atau ID e-Money">
                         </div>
 
-                        <!-- FIELD 3: KODE & DESKRIPSI PRODUK / NOMINAL -->
                         <div class="val-input-group">
                             <label class="val-label">3. KODE & DESKRIPSI PRODUK / NOMINAL</label>
                             <input type="text" id="paketInput" class="val-input" oninput="handleGenerate()" placeholder="Contoh: TDHAP11H - Happy 11GB 28 Hari / 20000">
@@ -194,7 +249,6 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
                             <h2 class="val-card-title" style="border: none; padding: 0;">💬 Teks Balasan Mitra</h2>
                             
-                            <!-- DUA TOMBOL: COPY TEXT & COPY IMAGE -->
                             <div style="display: flex; gap: 6px;">
                                 <button type="button" onclick="copyReportText()" id="btnCopy" class="val-btn val-btn-green" style="padding: 4px 10px; font-size: 10px;">
                                     📋 Copy Text
@@ -208,18 +262,52 @@
                         <textarea id="reportResult" readonly class="val-input val-textarea report-output"
                             placeholder="Teks validasi untuk mitra akan muncul di sini..."></textarea>
                     </div>
-
                 </div>
 
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT ENGINE & INTEGRASI BACKEND -->
+    <!-- MODAL SELEKSI MULTI-TRANSAKSI -->
+    <div id="selectTrxModal">
+        <div class="trx-modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="margin:0; font-size: 14px; color: #fbbf24;">📋 Ditemukan Beberapa Transaksi untuk ID Tersebut</h3>
+                <button onclick="closeTrxModal()" class="val-btn" style="background:#ef4444; color:#fff; padding:4px 8px;">✕ Tutup</button>
+            </div>
+            <p style="font-size:11px; color:#94a3b8; margin:0 0 10px 0;">Silahkan klik/pilih transaksi yang ingin dibuatkan validasinya:</p>
+
+            <table class="trx-table">
+                <thead>
+                    <tr>
+                        <th>Waktu Request</th>
+                        <th>ID Trx</th>
+                        <th>Produk / Nominal</th>
+                        <th>SN / TID</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="trxModalList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SCRIPT ENGINE -->
     <script>
         let rawNominalFromDB = "";
+        let fetchedTransactionsList = [];
 
-        // Set Default Waktu Saat Ini
+        // FUNGSI NOTIFIKASI TOAST MELAYANG (DURASI 4 DETIK)
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("customToast");
+            if (!toast) return;
+            toast.innerText = message;
+            toast.classList.toggle("error", isError);
+            toast.classList.add("show");
+            
+            setTimeout(() => toast.classList.remove("show"), 60000);
+        }
+
         function setCurrentTime() {
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
@@ -232,103 +320,69 @@
             document.getElementById('waktuInput').value = `${d}-${m}-${y} ${hh}:${mm}:${ss}`;
         }
 
-        // FUNGSI KONVERSI NOMOR HP KETIKAN AWAL '0' MENJADI '62'
         function formatPhone62(numStr) {
             if (!numStr) return "-";
             let clean = numStr.trim().replace(/[^0-9]/g, '');
-            if (clean.startsWith('0')) {
-                return '62' + clean.substring(1);
-            }
+            if (clean.startsWith('0')) return '62' + clean.substring(1);
             return clean || numStr;
         }
 
-        // FUNGSI PEMBERSIH & EKSTRAKSI NOMINAL MURNI (UNTUK PULSA REGULER)
         function getCleanNominal(inputText) {
             if (!inputText) return "-";
             let str = inputText.trim();
-
             if (/^\d+$/.test(str)) return str;
-
-            if (rawNominalFromDB && str.includes(rawNominalFromDB)) {
-                return rawNominalFromDB;
-            }
-
+            if (rawNominalFromDB && str.includes(rawNominalFromDB)) return rawNominalFromDB;
             let matchDirect = str.match(/\b\d{4,6}\b/);
             if (matchDirect) return matchDirect[0];
-
             let matchK = str.match(/(\d+)\s*(k|rb|ribu)/i);
             if (matchK) return String(parseInt(matchK[1]) * 1000);
-
             let matchNum = str.match(/\d+/);
             if (matchNum) {
                 let val = parseInt(matchNum[0]);
                 if (val < 1000) return String(val * 1000);
                 return String(val);
             }
-
             return rawNominalFromDB || str;
         }
 
-        // FUNGSI EKSTRAKSI DESKRIPSI MURNI TANPA KODE PRODUK (UNTUK PAKET DATA)
         function getCleanDeskripsi(inputText) {
             if (!inputText) return "-";
             let str = inputText.trim();
-
             if (str.includes(' - ')) {
                 let parts = str.split(' - ');
                 parts.shift();
                 return parts.join(' - ').trim();
             }
-
             return str;
         }
 
-        // FUNGSI DETEKSI KATEGORI / CLUSTER TINGKAT TINGGI (DENGAN KATA KUNCI PAKET LENGKAP)
         function detectAndSetCluster(idProduk = '', deskripsi = '', noHp = '', deskripsiBiller = '', idBiller = '') {
             const textBiller = `${idBiller} ${deskripsiBiller}`.toUpperCase();
             const textProduk = `${idProduk} ${deskripsi}`.toUpperCase();
             const cleanHp = noHp.replace(/[^0-9]/g, '');
 
-            // List Kata Kunci Lengkap Paket Data (Tri / Indosat)
-            const paketKeywords = [
-                'PAKET', 'GB', 'MB', 'DATA', 'HAPPY', 'AON', 'COMBO', 
-                'UNLI', 'HARIAN', 'BULANAN', 'FREEDOM', 'MINI', 'GIGA', 
-                'ALWAYS', 'BOOSTER', 'VOUCHER'
-            ];
+            const paketKeywords = ['PAKET', 'GB', 'MB', 'DATA', 'HAPPY', 'AON', 'COMBO', 'UNLI', 'HARIAN', 'BULANAN', 'FREEDOM', 'MINI', 'GIGA', 'ALWAYS', 'BOOSTER', 'VOUCHER'];
             const isPaketData = paketKeywords.some(kw => textProduk.includes(kw));
 
             let selectedCluster = "XL_DOMPUL";
 
-            // LEVEL 1: DETEKSI BERDASARKAN BILLER
             if (textBiller.includes('TOL') || textBiller.includes('MANDIRI') || textProduk.includes('TOL') || textProduk.includes('E-MONEY') || textProduk.includes('EMONEY')) {
                 selectedCluster = 'MANDIRI_TOLM';
-            }
-            else if (textBiller.includes('MOBO') || textBiller.includes('TRI') || textBiller.includes('THREE') || textBiller.includes('INDOSAT') || textBiller.includes('ISAT')) {
+            } else if (textBiller.includes('MOBO') || textBiller.includes('TRI') || textBiller.includes('THREE') || textBiller.includes('INDOSAT') || textBiller.includes('ISAT')) {
                 selectedCluster = isPaketData ? 'MOBO_PAKET' : 'MOBO_PULSA';
-            }
-            else if (textBiller.includes('DOMPUL') || textBiller.includes('XL') || textBiller.includes('AXIS')) {
+            } else if (textBiller.includes('DOMPUL') || textBiller.includes('XL') || textBiller.includes('AXIS')) {
                 selectedCluster = 'XL_DOMPUL';
-            }
-            else if (textBiller.includes('DIGIPOS') || textBiller.includes('TSEL') || textBiller.includes('TELKOMSEL')) {
+            } else if (textBiller.includes('DIGIPOS') || textBiller.includes('TSEL') || textBiller.includes('TELKOMSEL')) {
                 selectedCluster = 'TSEL_GIGA';
-            }
-
-            // LEVEL 2: DETEKSI BERDASARKAN KATA KUNCI PRODUK
-            else if (textProduk.includes('TOL') || textProduk.includes('E-MONEY') || textProduk.includes('EMONEY')) {
+            } else if (textProduk.includes('TOL') || textProduk.includes('E-MONEY') || textProduk.includes('EMONEY')) {
                 selectedCluster = 'MANDIRI_TOLM';
-            }
-            else if (textProduk.includes('MOBO') || textProduk.includes('TRI') || textProduk.includes('THREE') || textProduk.includes('INDOSAT') || textProduk.includes('ISAT')) {
+            } else if (textProduk.includes('MOBO') || textProduk.includes('TRI') || textProduk.includes('THREE') || textProduk.includes('INDOSAT') || textProduk.includes('ISAT')) {
                 selectedCluster = isPaketData ? 'MOBO_PAKET' : 'MOBO_PULSA';
-            } 
-            else if (textProduk.includes('TSEL') || textProduk.includes('TELKOMSEL') || textProduk.includes('SIMGOLD')) {
+            } else if (textProduk.includes('TSEL') || textProduk.includes('TELKOMSEL') || textProduk.includes('SIMGOLD')) {
                 selectedCluster = 'TSEL_GIGA';
-            } 
-            else if (textProduk.includes('XL') || textProduk.includes('XR') || textProduk.includes('DOMPUL') || textProduk.includes('AXIS')) {
+            } else if (textProduk.includes('XL') || textProduk.includes('XR') || textProduk.includes('DOMPUL') || textProduk.includes('AXIS')) {
                 selectedCluster = 'XL_DOMPUL';
-            }
-
-            // LEVEL 3: FALLBACK BERDASARKAN PREFIX NOMOR HP
-            else {
+            } else {
                 if (['0814','0815','0816','0855','0856','0857','0858','62856','62857','0895','0896','0897','0898','0899','62896','62895'].some(p => cleanHp.startsWith(p))) {
                     selectedCluster = isPaketData ? 'MOBO_PAKET' : 'MOBO_PULSA';
                 } else if (['0811','0812','0813','0821','0822','0823','0851','0852','0853','62812','62821'].some(p => cleanHp.startsWith(p))) {
@@ -339,16 +393,75 @@
             }
 
             const clusterSelect = document.getElementById('clusterSelect');
-            if (clusterSelect) {
-                clusterSelect.value = selectedCluster;
-            }
+            if (clusterSelect) clusterSelect.value = selectedCluster;
         }
 
-        // FUNGSI UTAMA FETCH API KE BACKEND FLASK
+        // FUNGSI ISI FIELD BERDASARKAN DOKUMEN TRANSAKSI YANG DIPILIH
+        function applySelectedTransaction(data) {
+            rawNominalFromDB = data.nominal || "";
+
+            document.getElementById('noHpInput').value = formatPhone62(data.no_hp);
+            document.getElementById('snInput').value = data.sn || "-";
+            document.getElementById('waktuInput').value = data.waktu || "-";
+            
+            let valProduk = "-";
+            if (data.id_produk && data.deskripsi_produk && data.id_produk !== data.deskripsi_produk) {
+                valProduk = `${data.id_produk} - ${data.deskripsi_produk}`;
+            } else {
+                valProduk = data.deskripsi_produk || data.id_produk || data.nominal || "-";
+            }
+            document.getElementById('paketInput').value = valProduk;
+
+            detectAndSetCluster(
+                data.id_produk, 
+                data.deskripsi_produk, 
+                data.no_hp, 
+                data.deskripsi_biller, 
+                data.id_biller
+            );
+
+            handleGenerate();
+            closeTrxModal();
+
+            // NOTIFIKASI PASTI MUNCUL SETIAP DATA DITERAPKAN KE FORM
+            const trxIdText = (data.id_transaksi && data.id_transaksi !== '-') ? ` #${data.id_transaksi}` : '';
+            showToast(`🎉 Data Transaksi${trxIdText} Berhasil Dimuat!`);
+        }
+
+        // POPUP MODAL MULTI-TRANSAKSI
+        function openTrxModal(list) {
+            fetchedTransactionsList = list;
+            const tbody = document.getElementById('trxModalList');
+            tbody.innerHTML = "";
+
+            list.forEach((item, index) => {
+                let prod = (item.id_produk && item.deskripsi_produk && item.id_produk !== item.deskripsi_produk) 
+                    ? `${item.id_produk} - ${item.deskripsi_produk}` 
+                    : (item.deskripsi_produk || item.id_produk || item.nominal || "-");
+
+                tbody.innerHTML += `
+                    <tr class="trx-row-item" onclick="applySelectedTransaction(fetchedTransactionsList[${index}])">
+                        <td>${item.waktu || '-'}</td>
+                        <td><b style="color:#fbbf24">${item.id_transaksi || '-'}</b></td>
+                        <td>${prod}</td>
+                        <td><code style="color:#38bdf8">${item.sn || '-'}</code></td>
+                        <td><button type="button" class="val-btn val-btn-blue" style="padding: 3px 8px; font-size: 10px;">Pilih 🎯</button></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('selectTrxModal').style.display = "flex";
+        }
+
+        function closeTrxModal() {
+            document.getElementById('selectTrxModal').style.display = "none";
+        }
+
+        // FETCH API KE BACKEND FLASK
         async function handleQueryValidation(e) {
             e.preventDefault();
             const billInfo = document.getElementById('billInfoInput').value.trim();
-            if (!billInfo) return alert("Masukkan bill_info1 (No. HP / ID) terlebih dahulu!");
+            if (!billInfo) return showToast("⚠️ Masukkan No. HP / ID terlebih dahulu!", true);
 
             const btnSubmit = e.target.querySelector('button[type="submit"]');
             const originalBtnText = btnSubmit.innerHTML;
@@ -368,41 +481,23 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    const data = result.data;
+                    const dataList = Array.isArray(result.data) ? result.data : [result.data];
 
-                    rawNominalFromDB = data.nominal || "";
-
-                    // 1. Fill parameter form (Otomatis ubah 08.. ke 628..)
-                    document.getElementById('noHpInput').value = formatPhone62(data.no_hp || billInfo);
-                    document.getElementById('snInput').value = data.sn || "-";
-                    document.getElementById('waktuInput').value = data.waktu || "-";
-                    
-                    let valProduk = "-";
-                    if (data.id_produk && data.deskripsi_produk && data.id_produk !== data.deskripsi_produk) {
-                        valProduk = `${data.id_produk} - ${data.deskripsi_produk}`;
+                    if (dataList.length === 1) {
+                        applySelectedTransaction(dataList[0]);
+                    } else if (dataList.length > 1) {
+                        openTrxModal(dataList);
+                        showToast(`📋 Ditemukan ${dataList.length} transaksi. Silahkan pilih salah satu!`);
                     } else {
-                        valProduk = data.deskripsi_produk || data.id_produk || data.nominal || "-";
+                        showToast("❌ Data transaksi tidak ditemukan!", true);
                     }
-                    document.getElementById('paketInput').value = valProduk;
-
-                    // 2. Auto-Select Cluster Kategori
-                    detectAndSetCluster(
-                        data.id_produk, 
-                        data.deskripsi_produk, 
-                        data.no_hp || billInfo, 
-                        data.deskripsi_biller, 
-                        data.id_biller
-                    );
-
-                    // 3. Generate Teks Validasi
-                    handleGenerate();
                     
                 } else {
-                    alert("❌ " + (result.message || "Data transaksi tidak ditemukan!"));
+                    showToast("❌ " + (result.message || "Data transaksi tidak ditemukan!"), true);
                 }
             } catch (err) {
                 console.error("Fetch error:", err);
-                alert("❌ Gagal terhubung ke server backend Python!");
+                showToast("❌ Gagal terhubung ke server backend!", true);
             } finally {
                 btnSubmit.innerHTML = originalBtnText;
                 btnSubmit.disabled = false;
@@ -454,17 +549,15 @@
             copyText.select();
             navigator.clipboard.writeText(copyText.value);
             
+            showToast("📋 Teks balasan berhasil disalin!");
             const btn = document.getElementById("btnCopy");
             btn.innerText = "✅ Copied!";
             setTimeout(() => btn.innerText = "📋 Copy Text", 1500);
         }
 
-        // FUNGSI COPY IMAGE (GENERATOR CANVAS HIGH-DPI WITH WHITE TEXT)
         async function copyReportImage() {
             const text = document.getElementById("reportResult").value;
-            if (!text || text.trim() === "") {
-                return alert("Belum ada teks untuk dibuat gambar!");
-            }
+            if (!text || text.trim() === "") return showToast("⚠️ Belum ada teks untuk dibuat gambar!", true);
 
             const btn = document.getElementById("btnCopyImg");
             const originalBtnText = btn.innerText;
@@ -512,16 +605,13 @@
                 canvas.height = height * 2;
                 ctx.scale(2, 2);
 
-                // Background Box
                 ctx.fillStyle = "#0f172a";
                 ctx.fillRect(0, 0, width, height);
 
-                // Border
                 ctx.strokeStyle = "#334155";
                 ctx.lineWidth = 1;
                 ctx.strokeRect(0, 0, width, height);
 
-                // Draw Text Putih Monospace
                 ctx.font = font;
                 ctx.fillStyle = "#ffffff";
                 ctx.textBaseline = "top";
@@ -537,27 +627,26 @@
                         await navigator.clipboard.write([
                             new ClipboardItem({ "image/png": blob })
                         ]);
+                        showToast("📷 Gambar Laporan disalin ke Clipboard!");
                         btn.innerText = "✅ Image Copied!";
                         setTimeout(() => btn.innerText = originalBtnText, 1500);
                     } catch (clipErr) {
                         console.error("Clipboard Error:", clipErr);
-                        alert("Gagal otomatis menyalin gambar. Pastikan izin Clipboard diaktifkan di browser.");
+                        showToast("❌ Gagal menyalin gambar ke Clipboard", true);
                         btn.innerText = originalBtnText;
                     }
                 }, "image/png");
 
             } catch (err) {
                 console.error("Render Error:", err);
-                alert("❌ Gagal membuat gambar: " + err.message);
+                showToast("❌ Gagal membuat gambar: " + err.message, true);
                 btn.innerText = originalBtnText;
             }
         }
 
-        // Init Default Waktu
         setCurrentTime();
     </script>
 
-    <!-- INJEKSI SIDEBAR & BOTTOM BAR -->
     <script src="sidebarv2.js"></script>
 </body>
 </html>
