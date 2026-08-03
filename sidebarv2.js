@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 2. STRUKTUR SIDEBAR
     const sidebarHTML = `
-    <div class="sidebar-brand">SECRET WARS</div>
+    <div class="sidebar-brand">DOOMSDAY</div>
     <div class="nav-menu">
       <a href="index.html" class="nav-item" data-page="index.html">🏠 MAIN MENU</a>
       <a href="qrisperiodik.html" class="nav-item" data-page="qrisperiodik.html">QRIS PERIODIK</a>
