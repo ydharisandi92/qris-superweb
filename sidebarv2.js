@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const data = await res.json();
             if (data.status === "success" && data.server_url) {
                 SERVER_URL = data.server_url;
+                window.SERVER_URL = data.server_url;
                 console.log("🌐 Sidebar Dynamic SERVER_URL Terhubung:", SERVER_URL);
             }
         } catch (err) {
@@ -35,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // 1. INJEKSI CSS STYLING SIDEBAR (LAYOUT DIOPTIMALKAN)
+    // 1. INJEKSI CSS STYLING SIDEBAR
     const styleID = "dynamic-sidebar-style";
     if (!document.getElementById(styleID)) {
         const styleElement = document.createElement("style");
@@ -46,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           flex-direction: column !important;
           height: 100vh !important;
           box-sizing: border-box !important;
-          padding-bottom: 50px !important; /* Mencegah bentrok dengan bottom bar */
+          padding-bottom: 50px !important;
       }
       .sidebar-brand {
           font-size: 14px !important;
@@ -122,9 +123,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       .dropdown-arrow { font-size: 9px; transition: transform 0.2s ease; }
       .dropdown-btn.active .dropdown-arrow { transform: rotate(180deg); }
 
-      /* WIDGET PIC ON DUTY DIPINDAH MAKSIMAL KE BAWAH */
+      /* WIDGET PIC ON DUTY BAWAH */
       .sidebar-pic-box {
-          margin-top: auto !important; /* MENDORONG ELEMEN KE PALING BAWAH */
+          margin-top: auto !important;
           margin-bottom: 8px;
           padding: 8px 10px;
           background: rgba(15, 23, 42, 0.75);
@@ -164,15 +165,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       .user-box { text-align: center; position: relative; z-index: 1000; }
       
-      /* LAYOUT TOMBOL SEJAJAR KANAN-KIRI */
       .user-actions { 
           display: flex; 
-          flex-direction: row !important; /* KANAN KIRI */
+          flex-direction: row !important;
           gap: 6px; 
           width: 100%; 
       }
       .btn-action {
-          flex: 1; /* MEMBAGI LEBAR SAMA RATA */
+          flex: 1;
           padding: 7px 4px; 
           border-radius: 6px;
           font-size: 10px; 
@@ -340,7 +340,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.body.insertAdjacentHTML("beforeend", bottomBarHTML);
     }
 
-    // 5. LOGIKA ENGINE PIC ON DUTY SIDEBAR
+    // 5. AUTO INJEK NAMA USER LOGGED IN KE INPUT PIC LAPORAN (PENTING!)
+    function autoInjectPicName() {
+        const picElement = document.getElementById("pic");
+        if (picElement && currentUser && currentUser !== "GUEST") {
+            picElement.value = currentUser;
+            if (typeof updateReportHeader === "function") {
+                updateReportHeader();
+            }
+        }
+    }
+
+    // 6. LOGIKA ENGINE PIC ON DUTY SIDEBAR
     function isShiftActive(shiftCode, now) {
         const cleanCode = String(shiftCode || '').toUpperCase().replace(/\s+/g, '');
         let matchedKey = null;
@@ -440,7 +451,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // 6. JAM REALTIME & HEARTBEAT
+    // 7. JAM REALTIME & HEARTBEAT
     function updateFooterClock() {
         const now = new Date();
         const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
@@ -512,6 +523,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // INITIALIZATION
+    autoInjectPicName();
+    setTimeout(autoInjectPicName, 300); // Retry delay untuk memastikan input #pic di HTML siap
+    
     loadInstantlyFromCache();
     await initServerUrl(); 
     syncActiveUsers();     
