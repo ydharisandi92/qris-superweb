@@ -293,11 +293,30 @@
     </div>
 
     <!-- SCRIPT ENGINE -->
+    <script src="sidebarv2.js"></script>
     <script>
+        // URL GOOGLE APPS SCRIPT DYNAMIC CONFIG
+        const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
+        let SERVER_URL = "http://localhost:5000"; // Fallback default
+
+        async function initServerUrl() {
+            try {
+                const res = await fetch(`${CASE_SCRIPT_URL}?action=get_server_url`);
+                const data = await res.json();
+                if (data.status === "success" && data.server_url) {
+                    SERVER_URL = data.server_url;
+                    window.SERVER_URL = data.server_url;
+                    console.log("🌐 Validasi Pulsa Dynamic SERVER_URL Terhubung:", SERVER_URL);
+                }
+            } catch (err) {
+                console.warn("⚠️ Gagal mengambil Dynamic SERVER_URL, memakai fallback localhost.");
+            }
+        }
+
         let rawNominalFromDB = "";
         let fetchedTransactionsList = [];
 
-        // FUNGSI NOTIFIKASI TOAST MELAYANG (DURASI 4 DETIK)
+        // FUNGSI NOTIFIKASI TOAST MELAYANG
         function showToast(message, isError = false) {
             const toast = document.getElementById("customToast");
             if (!toast) return;
@@ -305,7 +324,7 @@
             toast.classList.toggle("error", isError);
             toast.classList.add("show");
             
-            setTimeout(() => toast.classList.remove("show"), 60000);
+            setTimeout(() => toast.classList.remove("show"), 4000);
         }
 
         function setCurrentTime() {
@@ -423,7 +442,6 @@
             handleGenerate();
             closeTrxModal();
 
-            // NOTIFIKASI PASTI MUNCUL SETIAP DATA DITERAPKAN KE FORM
             const trxIdText = (data.id_transaksi && data.id_transaksi !== '-') ? ` #${data.id_transaksi}` : '';
             showToast(`🎉 Data Transaksi${trxIdText} Berhasil Dimuat!`);
         }
@@ -470,7 +488,8 @@
             btnSubmit.disabled = true;
 
             try {
-                const baseUrl = (typeof SERVER_URL !== 'undefined') ? SERVER_URL : 'http://localhost:5000';
+                // Menggunakan DYNAMIC SERVER URL yang sudah di-fetch
+                const baseUrl = window.SERVER_URL || SERVER_URL || 'http://localhost:5000';
                 
                 const response = await fetch(`${baseUrl}/api/get-bill-validation`, {
                     method: 'POST',
@@ -644,9 +663,11 @@
             }
         }
 
-        setCurrentTime();
+        // INITALIZATION
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initServerUrl();
+            setCurrentTime();
+        });
     </script>
-
-    <script src="sidebarv2.js"></script>
 </body>
 </html>
