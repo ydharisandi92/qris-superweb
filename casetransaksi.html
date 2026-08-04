@@ -443,13 +443,16 @@
 
                 if (res.ok && data.status === "success" && data.data) {
                     currentFetchedData = data.data;
+                    
+                    // Pembacaan fleksibel (Mendukung Alias maupun Kolom Asli Database)
                     document.getElementById("popIdTrx").innerText = data.data.id_transaksi || "-";
                     document.getElementById("popIdProduk").innerText = data.data.id_produk || "-";
                     document.getElementById("popTxDate").innerText = formatDateOnly(data.data.transaction_date);
-                    document.getElementById("popRc").innerText = data.data.status || "-";
-                    document.getElementById("popBill1").innerText = data.data["ID pelanggan 1"] || "-";
-                    document.getElementById("popBill2").innerText = data.data["ID pelanggan 2"] || "-";
-                    document.getElementById("popSn").innerText = data.data.SN || "-";
+                    document.getElementById("popRc").innerText = data.data.status || data.data.response_code || "-";
+                    document.getElementById("popBill1").innerText = data.data["ID pelanggan 1"] || data.data.bill_info1 || "-";
+                    document.getElementById("popBill2").innerText = data.data["ID pelanggan 2"] || data.data.bill_info2 || "-";
+                    document.getElementById("popSn").innerText = data.data.SN || data.data.bill_info5 || data.data.sn || "-";
+                    
                     document.getElementById("resultModal").style.display = "flex";
                 } else {
                     showCustomAlert(data.message || "Data tidak ditemukan!", "Tidak Ditemukan", "⚠️");
@@ -464,7 +467,7 @@
             document.getElementById("resultModal").style.display = "none";
             if (currentFetchedData) {
                 document.getElementById("summaryTrxId").innerText = currentFetchedData.id_transaksi || "-";
-                document.getElementById("summaryBill1").innerText = currentFetchedData["ID pelanggan 1"] || "-";
+                document.getElementById("summaryBill1").innerText = currentFetchedData["ID pelanggan 1"] || currentFetchedData.bill_info1 || "-";
                 document.getElementById("formKendalaSection").style.display = "block";
                 document.getElementById("formKendalaSection").scrollIntoView({ behavior: 'smooth' });
             }
