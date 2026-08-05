@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SECRET WARS - Generator Validasi Pulsa</title>
     
-    <!-- Memanggil CSS Utama Aplikasi -->
+    <!-- Google Font Montserrat & Open Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome & Themify Icons CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+    <!-- Bootstrap 4 CSS CDN untuk Render SS GIGA -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!-- html2canvas CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- CSS Utama Aplikasi -->
     <link rel="stylesheet" href="styles.css">
 
     <style>
@@ -65,7 +74,7 @@
             border-radius: 5px;
             padding: 6px 10px;
             color: #fff;
-            font-size: 12px;
+            font-size: 16px;
             box-sizing: border-box;
             outline: none;
         }
@@ -84,20 +93,24 @@
         .val-btn-blue:hover { background: #1e88e5; }
         .val-btn-green { background: #059669; color: #fff; }
         .val-btn-green:hover { background: #10b981; }
+        .val-btn-orange { background: #ea580c; color: #fff; }
+        .val-btn-orange:hover { background: #f97316; }
+        .val-btn-cyan { background: #0891b2; color: #fff; }
+        .val-btn-cyan:hover { background: #06b6d4; }
         
         .report-output {
             background: #0f172a;
             color: #ffffff;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 16px;
             line-height: 1.5;
             height: 100%;
             min-height: 260px;
             resize: none;
         }
 
-        /* MODAL POPUP SELEKSI TRANSAKSI */
-        #selectTrxModal {
+        /* MODAL POPUP SELEKSI TRANSAKSI & PREVIEW GAMBAR */
+        #selectTrxModal, #previewImgModal {
             display: none;
             position: fixed;
             inset: 0;
@@ -111,10 +124,12 @@
             background: #1e293b;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            width: 90%;
-            max-width: 750px;
-            padding: 16px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 95%;
+            max-width: 1150px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 18px 24px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.6);
         }
         .trx-table {
             width: 100%;
@@ -150,7 +165,7 @@
             color: #ffffff;
             padding: 12px 20px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 700;
             z-index: 999999;
             opacity: 0;
@@ -169,6 +184,113 @@
         }
         #customToast.error {
             background: #ef4444;
+        }
+
+        /* CSS KHUSUS TABEL RENDER SS GIGA */
+        .ssgiga-box {
+            position: relative;
+            display: block;
+            background-color: #fff;
+            border: none;
+            padding: 0;
+        }
+        .ssgiga-table-grey-head thead {
+            background-color: #f5f5f5;
+        }
+        .ssgiga-table-grey-head thead th {
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            padding: 18px 16px;
+            vertical-align: middle !important;
+            white-space: nowrap;
+            font-size: 14px;
+            text-align: center;
+            color: #333;
+        }
+        .ssgiga-table td, .ssgiga-table th {
+            vertical-align: middle !important;
+            padding: 18px 16px;
+            border-top: 1px solid #eceeef;
+            white-space: nowrap;
+            font-size: 14px;
+            text-align: center;
+            color: #333;
+        }
+        .ssgiga-btn {
+            border-radius: 0;
+            font-size: 11px;
+            padding: 2px 6px;
+            background-color: #43b968;
+            border-color: #43b968;
+            color: #fff;
+            display: inline-block;
+            position: relative;
+            padding-left: 28px;
+            border: none;
+        }
+        .ssgiga-btn-label {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 2px 0;
+            width: 22px;
+            background-color: rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* CARD STYLE DARI TEMPLATE KISEL V2 */
+        .kisel2-table-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        .kisel2-custom-table {
+            width: 100%;
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .kisel2-custom-table th {
+            background-color: #f1f3f7 !important;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 16px;
+            padding: 22px 16px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .kisel2-custom-table th:last-child {
+            border-right: none;
+        }
+        .kisel2-custom-table td {
+            padding: 22px 16px;
+            font-size: 16px;
+            color: #1e293b;
+            text-align: center;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            border-right: 1px solid #f1f5f9;
+            white-space: nowrap;
+            background-color: #ffffff;
+        }
+        .kisel2-custom-table td:last-child {
+            border-right: none;
+        }
+        .kisel2-rc-badge-green {
+            background-color: #00c853;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -244,23 +366,32 @@
                         </button>
                     </div>
 
-                    <!-- PANEL OUTPUT TEKS BALASAN MITRA -->
+                    <!-- PANEL OUTPUT TEKS BALASAN MITRA DENGAN TOOLS DI SEBELAH KANAN -->
                     <div class="val-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
                             <h2 class="val-card-title" style="border: none; padding: 0;">💬 Teks Balasan Mitra</h2>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; height: 100%; align-items: stretch;">
+                            <textarea id="reportResult" readonly class="val-input val-textarea report-output" style="flex: 1;"
+                                placeholder="Teks validasi untuk mitra akan muncul di sini..."></textarea>
                             
-                            <div style="display: flex; gap: 6px;">
-                                <button type="button" onclick="copyReportText()" id="btnCopy" class="val-btn val-btn-green" style="padding: 4px 10px; font-size: 10px;">
+                            <!-- TOOLS VERTIKAL DARI ATAS KE BAWAH -->
+                            <div style="display: flex; flex-direction: column; gap: 8px; width: 120px;">
+                                <button type="button" onclick="copyReportText()" id="btnCopy" class="val-btn val-btn-green" style="padding: 8px; font-size: 11px; width: 100%;">
                                     📋 Copy Text
                                 </button>
-                                <button type="button" onclick="copyReportImage()" id="btnCopyImg" class="val-btn val-btn-blue" style="padding: 4px 10px; font-size: 10px; background: #2563eb;">
+                                <button type="button" onclick="copyReportImage()" id="btnCopyImg" class="val-btn val-btn-blue" style="padding: 8px; font-size: 11px; width: 100%; background: #2563eb;">
                                     📷 Copy Image
+                                </button>
+                                <button type="button" onclick="copySskiselImage()" id="btnCopySskisel" class="val-btn val-btn-orange" style="padding: 8px; font-size: 11px; width: 100%;">
+                                    📷 SS Kisel
+                                </button>
+                                <button type="button" onclick="copySsgigaImage()" id="btnCopySsgiga" class="val-btn val-btn-cyan" style="padding: 8px; font-size: 11px; width: 100%;">
+                                    📷 SS Giga
                                 </button>
                             </div>
                         </div>
-
-                        <textarea id="reportResult" readonly class="val-input val-textarea report-output"
-                            placeholder="Teks validasi untuk mitra akan muncul di sini..."></textarea>
                     </div>
                 </div>
 
@@ -270,9 +401,9 @@
 
     <!-- MODAL SELEKSI MULTI-TRANSAKSI -->
     <div id="selectTrxModal">
-        <div class="trx-modal-card">
+        <div class="trx-modal-card" style="max-width: 750px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h3 style="margin:0; font-size: 14px; color: #fbbf24;">📋 Ditemukan Beberapa Transaksi untuk ID Tersebut</h3>
+                <h3 style="margin:0; font-size: 16px; color: #fbbf24;">📋 Ditemukan Beberapa Transaksi untuk ID Tersebut</h3>
                 <button onclick="closeTrxModal()" class="val-btn" style="background:#ef4444; color:#fff; padding:4px 8px;">✕ Tutup</button>
             </div>
             <p style="font-size:11px; color:#94a3b8; margin:0 0 10px 0;">Silahkan klik/pilih transaksi yang ingin dibuatkan validasinya:</p>
@@ -292,12 +423,127 @@
         </div>
     </div>
 
+    <!-- MODAL PREVIEW GAMBAR DINAMIS -->
+    <div id="previewImgModal">
+        <div class="trx-modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <h3 style="margin:0; font-size: 15px; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
+                    🖼️ Preview Gambar Laporan Validasi
+                </h3>
+                <button type="button" onclick="closePreviewModal()" class="val-btn" style="background:#ef4444; color:#fff; padding:6px 12px; font-size: 16px;">✕ Tutup</button>
+            </div>
+            
+            <!-- CONTAINER MULTI PREVIEW -->
+            <div id="previewImgContainer" style="display: flex; flex-direction: column; gap: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- HIDDEN CONTAINER RENDER SSKISEL V1 -->
+    <div id="sskiselRenderWrapper" style="position: absolute; left: -9999px; top: -9999px; width: 1100px; background: #ffffff; padding: 8px 10px; font-family: 'Montserrat', sans-serif;">
+        <table style="width: 100% !important; border-collapse: collapse !important; border: 1px solid #e2e8f0 !important; background: #ffffff;">
+            <thead>
+                <tr style="background-color: #ffffff;">
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">No</th>
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">Datetime</th>
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">Trx ID</th>
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">Msisdn</th>
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">RC</th>
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">Amount</th>
+                    <th style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; color: #334155 !important; font-weight: 800; font-size: 15px; text-align: center; letter-spacing: 0.2px;">Serial Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background-color: #f2f5f9 !important; color: #475569; font-weight: 500;">
+                    <td style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">1</td>
+                    <td id="sskiselTdDatetime" style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">-</td>
+                    <td style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">
+                        <span id="sskiselTdTrxId" style="background-image: repeating-linear-gradient(0deg, #0f172a 0px, #0f172a 4px, #334155 4px, #334155 8px), repeating-linear-gradient(90deg, transparent 0px, transparent 4px, rgba(15, 23, 42, 0.65) 4px, rgba(15, 23, 42, 0.65) 8px); color: transparent !important; padding: 3px 12px; border-radius: 2px; display: inline-block; user-select: none;">966233948</span>
+                    </td>
+                    <td id="sskiselTdMsisdn" style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">-</td>
+                    <td style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">
+                        <span style="background-color: #00c9a7; color: #ffffff; font-weight: 800 !important; padding: 4px 10px; border-radius: 5px; font-size: 16px; letter-spacing: 0.5px; display: inline-block;">00</span>
+                    </td>
+                    <td id="sskiselTdAmount" style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">-</td>
+                    <td id="sskiselTdSn" style="border: 1px solid #e2e8f0 !important; padding: 20px 16px !important; font-size: 15px; text-align: center;">-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- HIDDEN CONTAINER RENDER SSKISEL V2 -->
+    <div id="sskisel2RenderWrapper" style="position: absolute; left: -9999px; top: -9999px; width: 1200px; background: #ffffff; padding: 8px 10px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+        <div class="kisel2-table-card">
+            <table class="kisel2-custom-table">
+                <thead>
+                    <tr>
+                        <th>Datetime <span style="color: #8e9cb0; margin-left: 6px; font-weight: 400; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-arrow-up" style="font-size: 11px; transform: scaleY(1.2);"></i><i class="fa-solid fa-arrow-down" style="font-size: 11px; transform: scaleY(1.2);"></i></span></th>
+                        <th>Trx ID <span style="color: #8e9cb0; margin-left: 6px; font-weight: 400; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-arrow-up" style="font-size: 11px; transform: scaleY(1.2);"></i><i class="fa-solid fa-arrow-down" style="font-size: 11px; transform: scaleY(1.2);"></i></span></th>
+                        <th>Msisdn <span style="color: #8e9cb0; margin-left: 6px; font-weight: 400; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-arrow-up" style="font-size: 11px; transform: scaleY(1.2);"></i><i class="fa-solid fa-arrow-down" style="font-size: 11px; transform: scaleY(1.2);"></i></span></th>
+                        <th>RC <span style="color: #8e9cb0; margin-left: 6px; font-weight: 400; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-arrow-up" style="font-size: 11px; transform: scaleY(1.2);"></i><i class="fa-solid fa-arrow-down" style="font-size: 11px; transform: scaleY(1.2);"></i></span></th>
+                        <th>Amount <span style="color: #8e9cb0; margin-left: 6px; font-weight: 400; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-arrow-up" style="font-size: 11px; transform: scaleY(1.2);"></i><i class="fa-solid fa-arrow-down" style="font-size: 11px; transform: scaleY(1.2);"></i></span></th>
+                        <th>Serial Number <span style="color: #8e9cb0; margin-left: 6px; font-weight: 400; display: inline-flex; align-items: center; gap: 2px;"><i class="fa-solid fa-arrow-up" style="font-size: 11px; transform: scaleY(1.2);"></i><i class="fa-solid fa-arrow-down" style="font-size: 11px; transform: scaleY(1.2);"></i></span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="sskisel2TdDatetime">-</td>
+                        <td>
+                            <span id="sskisel2TdTrxId" style="background-image: repeating-linear-gradient(0deg, #0f172a 0px, #0f172a 4px, #334155 4px, #334155 8px), repeating-linear-gradient(90deg, transparent 0px, transparent 4px, rgba(15, 23, 42, 0.65) 4px, rgba(15, 23, 42, 0.65) 8px); color: transparent !important; padding: 3px 12px; border-radius: 2px; display: inline-block; user-select: none;">966233948</span>
+                        </td>
+                        <td id="sskisel2TdMsisdn">-</td>
+                        <td><span class="kisel2-rc-badge-green">00</span></td>
+                        <td id="sskisel2TdAmount">-</td>
+                        <td id="sskisel2TdSn">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HIDDEN CONTAINER RENDER SS GIGA -->
+    <div id="ssgigaRenderWrapper" style="position: absolute; left: -9999px; top: -9999px; width: 1100px; background: #ffffff; padding: 8px 10px; font-family: 'Open Sans', sans-serif;">
+        <div class="ssgiga-box">
+            <div class="table-responsive">
+                <table class="table ssgiga-table-grey-head ssgiga-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Ref ID</th>
+                            <th class="text-center">Tgl Trx</th>
+                            <th class="text-center">No Tujuan</th>
+                            <th class="text-center">Ammount</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">SN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="text-center">1</th>
+                            <td id="ssgigaTdRefId" class="text-center">966336543</td>
+                            <td id="ssgigaTdTglTrx" class="text-center">2026-08-06 01:06:14</td>
+                            <td id="ssgigaTdNoTujuan" class="text-center">081775256213</td>
+                            <td id="ssgigaTdHargaJual" class="text-center">5.838</td>
+                            <td class="text-center">
+                                <button type="button" class="ssgiga-btn">
+                                    <span class="ssgiga-btn-label"><i class="ti-check"></i></span> Sukses
+                                </button>
+                            </td>
+                            <td id="ssgigaTdSn" class="text-center">TKXL0508df4712</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT ENGINE -->
     <script src="sidebarv2.js"></script>
     <script>
-        // URL GOOGLE APPS SCRIPT DYNAMIC CONFIG
         const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
-        let SERVER_URL = "http://localhost:5000"; // Fallback default
+        let SERVER_URL = "http://localhost:5000";
+
+        let selectedTrxData = null;
+        let activeBlobsMap = {}; 
 
         async function initServerUrl() {
             try {
@@ -316,7 +562,6 @@
         let rawNominalFromDB = "";
         let fetchedTransactionsList = [];
 
-        // FUNGSI NOTIFIKASI TOAST MELAYANG
         function showToast(message, isError = false) {
             const toast = document.getElementById("customToast");
             if (!toast) return;
@@ -343,6 +588,13 @@
             if (!numStr) return "-";
             let clean = numStr.trim().replace(/[^0-9]/g, '');
             if (clean.startsWith('0')) return '62' + clean.substring(1);
+            return clean || numStr;
+        }
+
+        function formatPhone08(numStr) {
+            if (!numStr) return "-";
+            let clean = numStr.trim().replace(/[^0-9]/g, '');
+            if (clean.startsWith('62')) return '0' + clean.substring(2);
             return clean || numStr;
         }
 
@@ -391,13 +643,13 @@
                 selectedCluster = isPaketData ? 'MOBO_PAKET' : 'MOBO_PULSA';
             } else if (textBiller.includes('DOMPUL') || textBiller.includes('XL') || textBiller.includes('AXIS')) {
                 selectedCluster = 'XL_DOMPUL';
-            } else if (textBiller.includes('DIGIPOS') || textBiller.includes('TSEL') || textBiller.includes('TELKOMSEL')) {
+            } else if (textBiller.includes('DIGIPOS') || textBiller.includes('TSEL') || textBiller.includes('TELKOMSEL') || textBiller.includes('SSKISEL') || textBiller.includes('KISEL')) {
                 selectedCluster = 'TSEL_GIGA';
             } else if (textProduk.includes('TOL') || textProduk.includes('E-MONEY') || textProduk.includes('EMONEY')) {
                 selectedCluster = 'MANDIRI_TOLM';
             } else if (textProduk.includes('MOBO') || textProduk.includes('TRI') || textProduk.includes('THREE') || textProduk.includes('INDOSAT') || textProduk.includes('ISAT')) {
                 selectedCluster = isPaketData ? 'MOBO_PAKET' : 'MOBO_PULSA';
-            } else if (textProduk.includes('TSEL') || textProduk.includes('TELKOMSEL') || textProduk.includes('SIMGOLD')) {
+            } else if (textProduk.includes('TSEL') || textProduk.includes('TELKOMSEL') || textProduk.includes('SIMGOLD') || textProduk.includes('SSKISEL') || textProduk.includes('KISEL')) {
                 selectedCluster = 'TSEL_GIGA';
             } else if (textProduk.includes('XL') || textProduk.includes('XR') || textProduk.includes('DOMPUL') || textProduk.includes('AXIS')) {
                 selectedCluster = 'XL_DOMPUL';
@@ -415,8 +667,8 @@
             if (clusterSelect) clusterSelect.value = selectedCluster;
         }
 
-        // FUNGSI ISI FIELD BERDASARKAN DOKUMEN TRANSAKSI YANG DIPILIH
         function applySelectedTransaction(data) {
+            selectedTrxData = data;
             rawNominalFromDB = data.nominal || "";
 
             document.getElementById('noHpInput').value = formatPhone62(data.no_hp);
@@ -446,7 +698,6 @@
             showToast(`🎉 Data Transaksi${trxIdText} Berhasil Dimuat!`);
         }
 
-        // POPUP MODAL MULTI-TRANSAKSI
         function openTrxModal(list) {
             fetchedTransactionsList = list;
             const tbody = document.getElementById('trxModalList');
@@ -475,7 +726,6 @@
             document.getElementById('selectTrxModal').style.display = "none";
         }
 
-        // FETCH API KE BACKEND FLASK
         async function handleQueryValidation(e) {
             e.preventDefault();
             const billInfo = document.getElementById('billInfoInput').value.trim();
@@ -488,7 +738,6 @@
             btnSubmit.disabled = true;
 
             try {
-                // Menggunakan DYNAMIC SERVER URL yang sudah di-fetch
                 const baseUrl = window.SERVER_URL || SERVER_URL || 'http://localhost:5000';
                 
                 const response = await fetch(`${baseUrl}/api/get-bill-validation`, {
@@ -574,6 +823,7 @@
             setTimeout(() => btn.innerText = "📋 Copy Text", 1500);
         }
 
+        /* ---------------- GENERATE IMAGE DENGAN CANVAS (DARK CONSOLE VERSION) ---------------- */
         async function copyReportImage() {
             const text = document.getElementById("reportResult").value;
             if (!text || text.trim() === "") return showToast("⚠️ Belum ada teks untuk dibuat gambar!", true);
@@ -584,9 +834,8 @@
 
             try {
                 const padding = 16;
-                const fontSize = 13;
-                const lineHeight = 20;
                 const font = "13px Consolas, Monaco, 'Courier New', monospace";
+                const lineHeight = 20;
                 const maxWidth = 580;
 
                 const canvas = document.createElement("canvas");
@@ -620,9 +869,9 @@
                 const width = Math.max(maxLineWidth + padding * 2, 420);
                 const height = lines.length * lineHeight + padding * 2;
 
-                canvas.width = width * 2;
-                canvas.height = height * 2;
-                ctx.scale(2, 2);
+                canvas.width = width * 4;
+                canvas.height = height * 4;
+                ctx.scale(4, 4);
 
                 ctx.fillStyle = "#0f172a";
                 ctx.fillRect(0, 0, width, height);
@@ -639,21 +888,14 @@
                     ctx.fillText(l, padding, padding + idx * lineHeight);
                 });
 
-                canvas.toBlob(async (blob) => {
+                canvas.toBlob((blob) => {
                     if (!blob) throw new Error("Gagal membuat blob gambar!");
-
-                    try {
-                        await navigator.clipboard.write([
-                            new ClipboardItem({ "image/png": blob })
-                        ]);
-                        showToast("📷 Gambar Laporan disalin ke Clipboard!");
-                        btn.innerText = "✅ Image Copied!";
-                        setTimeout(() => btn.innerText = originalBtnText, 1500);
-                    } catch (clipErr) {
-                        console.error("Clipboard Error:", clipErr);
-                        showToast("❌ Gagal menyalin gambar ke Clipboard", true);
-                        btn.innerText = originalBtnText;
-                    }
+                    renderModalPreviews([{
+                        title: "📷 Preview Text Laporan",
+                        blob: blob,
+                        key: "singleText"
+                    }]);
+                    btn.innerText = originalBtnText;
                 }, "image/png");
 
             } catch (err) {
@@ -663,7 +905,146 @@
             }
         }
 
-        // INITALIZATION
+        /* ---------------- FUNSI 1 TOMBOL SS KISEL UNTUK RENDER V1 & V2 SEKALIGUS ---------------- */
+        async function copySskiselImage() {
+            const btn = document.getElementById("btnCopySskisel");
+            const originalBtnText = btn.innerText;
+            btn.innerText = "⏳ Rendering V1 & V2...";
+
+            try {
+                const rawNominal = getCleanNominal(document.getElementById('paketInput').value || "");
+                let numParsed = parseInt(rawNominal) || 0;
+                let formattedAmount = numParsed > 0 ? "Rp. " + numParsed.toLocaleString('id-ID') : (rawNominal || "-");
+
+                let trxIdVal = (selectedTrxData && selectedTrxData.id_transaksi) ? selectedTrxData.id_transaksi : "966233948";
+
+                // INJEKSI DATA KE V1
+                document.getElementById("sskiselTdDatetime").innerText = document.getElementById('waktuInput').value || "-";
+                document.getElementById("sskiselTdTrxId").innerText = trxIdVal || "966233948";
+                document.getElementById("sskiselTdMsisdn").innerText = formatPhone08(document.getElementById('noHpInput').value || "");
+                document.getElementById("sskiselTdAmount").innerText = formattedAmount;
+                document.getElementById("sskiselTdSn").innerText = document.getElementById('snInput').value || "-";
+
+                // INJEKSI DATA KE V2
+                document.getElementById("sskisel2TdDatetime").innerText = document.getElementById('waktuInput').value || "-";
+                document.getElementById("sskisel2TdTrxId").innerText = trxIdVal || "966233948";
+                document.getElementById("sskisel2TdMsisdn").innerText = formatPhone08(document.getElementById('noHpInput').value || "");
+                document.getElementById("sskisel2TdAmount").innerText = formattedAmount;
+                document.getElementById("sskisel2TdSn").innerText = document.getElementById('snInput').value || "-";
+
+                // RENDER CANVAS V1
+                const wrapper1 = document.getElementById("sskiselRenderWrapper");
+                const canvas1 = await html2canvas(wrapper1, { backgroundColor: "#ffffff", scale: 4 });
+                const blob1 = await new Promise(resolve => canvas1.toBlob(resolve, "image/png"));
+
+                // RENDER CANVAS V2
+                const wrapper2 = document.getElementById("sskisel2RenderWrapper");
+                const canvas2 = await html2canvas(wrapper2, { backgroundColor: "#ffffff", scale: 4 });
+                const blob2 = await new Promise(resolve => canvas2.toBlob(resolve, "image/png"));
+
+                if (!blob1 || !blob2) throw new Error("Gagal membuat blob gambar V1 atau V2!");
+
+                renderModalPreviews([
+                    { title: "🟠 Versi 1 (Classic Table / Montserrat)", blob: blob1, key: "v1" },
+                    { title: "🟣 Versi 2 (Dashboard Style / Segoe UI)", blob: blob2, key: "v2" }
+                ]);
+
+                btn.innerText = originalBtnText;
+
+            } catch (err) {
+                console.error("Render Error:", err);
+                showToast("❌ Gagal membuat SS Kisel: " + err.message, true);
+                btn.innerText = originalBtnText;
+            }
+        }
+
+        /* ---------------- KHUSUS TOMBOL SS GIGA ---------------- */
+        async function copySsgigaImage() {
+            const btn = document.getElementById("btnCopySsgiga");
+            const originalBtnText = btn.innerText;
+            btn.innerText = "⏳ Rendering...";
+
+            try {
+                const rawNominal = getCleanNominal(document.getElementById('paketInput').value || "");
+                let numParsed = parseInt(rawNominal) || 0;
+                let formattedHarga = numParsed > 0 ? numParsed.toLocaleString('id-ID') : (rawNominal || "-");
+
+                let refIdVal = (selectedTrxData && selectedTrxData.id_transaksi) ? selectedTrxData.id_transaksi : "966336543";
+
+                document.getElementById("ssgigaTdRefId").innerText = refIdVal;
+                document.getElementById("ssgigaTdTglTrx").innerText = document.getElementById('waktuInput').value || "-";
+                document.getElementById("ssgigaTdNoTujuan").innerText = formatPhone08(document.getElementById('noHpInput').value || "");
+                document.getElementById("ssgigaTdHargaJual").innerText = formattedHarga;
+                document.getElementById("ssgigaTdSn").innerText = document.getElementById('snInput').value || "-";
+
+                const wrapper = document.getElementById("ssgigaRenderWrapper");
+                const canvas = await html2canvas(wrapper, { backgroundColor: "#ffffff", scale: 4 });
+                
+                canvas.toBlob((blob) => {
+                    if (!blob) throw new Error("Gagal membuat blob gambar!");
+                    renderModalPreviews([{
+                        title: "📷 Preview SS Giga",
+                        blob: blob,
+                        key: "ssgiga"
+                    }]);
+                    btn.innerText = originalBtnText;
+                }, "image/png");
+
+            } catch (err) {
+                console.error("Render Error:", err);
+                showToast("❌ Gagal membuat SS Giga: " + err.message, true);
+                btn.innerText = originalBtnText;
+            }
+        }
+
+        /* ---------------- HELPER UNTUK RENDERING MULTI PREVIEW MODAL ---------------- */
+        function renderModalPreviews(items) {
+            const container = document.getElementById("previewImgContainer");
+            container.innerHTML = "";
+            activeBlobsMap = {};
+
+            items.forEach((item) => {
+                activeBlobsMap[item.key] = item.blob;
+                const imgUrl = URL.createObjectURL(item.blob);
+
+                container.innerHTML += `
+                    <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+                        <h4 style="font-size: 15px; color: #fbbf24; margin: 0 0 10px 0; text-align: left;">${item.title}</h4>
+                        <div style="margin-bottom: 12px; overflow-x: auto; display: flex; justify-content: center;">
+                            <img src="${imgUrl}" alt="${item.title}" style="width: 100%; max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" />
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button type="button" onclick="confirmCopyImageByKey('${item.key}')" class="val-btn val-btn-green" style="padding: 6px 14px; font-size: 11px;">
+                                📋 Salin Gambar Ini ke Clipboard
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById("previewImgModal").style.display = "flex";
+        }
+
+        function closePreviewModal() {
+            document.getElementById("previewImgModal").style.display = "none";
+        }
+
+        async function confirmCopyImageByKey(key) {
+            const blob = activeBlobsMap[key];
+            if (!blob) return showToast("⚠️ Gambar tidak ditemukan!", true);
+
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ "image/png": blob })
+                ]);
+                showToast("📷 Gambar berhasil disalin ke Clipboard!");
+            } catch (clipErr) {
+                console.error("Clipboard Error:", clipErr);
+                showToast("❌ Gagal menyalin gambar ke Clipboard", true);
+            }
+        }
+
+        // INITIALIZATION
         document.addEventListener("DOMContentLoaded", async () => {
             await initServerUrl();
             setCurrentTime();
