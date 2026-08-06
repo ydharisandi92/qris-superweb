@@ -5,239 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - RANGER+ Monitoring System</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body, html {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-app);
-        }
-        .login-card {
-            background: #1e293b;
-            border: 1px solid var(--border-color);
-            border-bottom: 4px solid var(--accent-gold);
-            border-radius: 16px;
-            padding: 32px 28px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-        .login-card img {
-            height: 50px;
-            margin-bottom: 16px;
-            filter: brightness(0) invert(1);
-        }
-        .login-card h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #ffffff;
-            margin: 0 0 4px 0;
-            text-transform: uppercase;
-        }
-        .login-card p {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin: 0 0 16px 0;
-        }
-        .form-group {
-            text-align: left;
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            color: #f8fafc;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px 12px;
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 13px;
-            outline: none;
-            text-transform: uppercase;
-        }
-        .form-group input:focus {
-            border-color: #3b82f6;
-        }
-
-        /* FIX PERBAIKAN POSISI PASSWORD WRAPPER & TOMBOL TOGGLE */
-        .password-wrapper {
-            position: relative !important;
-            width: 100% !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        .password-wrapper input {
-            display: block !important;
-            width: 100% !important;
-            padding-right: 42px !important;
-            box-sizing: border-box !important;
-            margin: 0 !important;
-        }
-        .toggle-password-btn {
-            position: absolute !important;
-            right: 8px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 30px !important;
-            height: 30px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border: none !important;
-            background: transparent !important;
-            font-size: 16px !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            border-radius: 6px !important;
-            user-select: none !important;
-            box-sizing: border-box !important;
-            z-index: 5 !important;
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
-            transition: background 0.2s ease !important;
-        }
-        .toggle-password-btn:hover {
-            background: rgba(148, 163, 184, 0.15) !important;
-        }
-
-        .capslock-warning {
-            display: none;
-            margin-top: 8px;
-            color: #fbbf24;
-            font-size: 11px;
-            font-weight: 700;
-            line-height: 1.4;
-        }
-        .capslock-warning.show {
-            display: block;
-        }
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            background: #1565c0;
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: background 0.2s;
-        }
-        .btn-login:hover {
-            background: #1e88e5;
-        }
-        .btn-login:disabled {
-            background: #475569;
-            cursor: not-allowed;
-        }
-        .error-msg {
-            color: #ef4444;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 12px;
-            display: none;
-        }
-
-        /* STYLES STATUS SERVER & REFRESH */
-        .server-status-box {
-            margin-top: 20px;
-            padding-top: 14px;
-            border-top: 1px dashed var(--border-color, #334155);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-        }
-        .status-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #ef4444;
-            display: inline-block;
-            box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
-            transition: all 0.3s ease;
-        }
-        .status-dot.online {
-            background-color: #22c55e;
-            box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
-        }
-        .btn-refresh-server {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border-color, #334155);
-            color: #94a3b8;
-            border-radius: 6px;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        .btn-refresh-server:hover {
-            background: #334155;
-            color: #ffffff;
-            border-color: #475569;
-        }
-        .spin {
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-    </style>
 </head>
-<body>
+<body class="login-page">
 
-    <div class="login-card">
-        <h2>DOOMSDAY</h2>
-        <p>Silahkan login dengan akun anda</p>
+    <!-- LAYER CYBER GRID -->
+    <div class="cyber-bg" id="cyberBg"></div>
+
+    <!-- ANIMASI DETAK JANTUNG MONITOR (ECG PULSE LINE) -->
+    <div class="ecg-container">
+        <svg class="ecg-svg" viewBox="0 0 1200 180" preserveAspectRatio="none">
+            <path class="ecg-path" d="M0,90 L200,90 L210,80 L215,90 L225,90 L235,30 L245,150 L255,70 L265,100 L275,90 L300,90 L600,90 L610,80 L615,90 L625,90 L635,30 L645,150 L655,70 L665,100 L675,90 L700,90 L1000,90 L1010,80 L1015,90 L1025,90 L1035,30 L1045,150 L1055,70 L1065,100 L1075,90 L1200,90" />
+        </svg>
+    </div>
+
+    <!-- KARTU LOGIN GLASSMORPHISM -->
+    <div class="login-card" id="loginCard">
+        <div class="scanline"></div>
+        <h2 id="loginTitle">DOOMSDAY</h2>
+        <p id="loginSub">AUTENTIKASI SISTEM TINGKAT LINGKUNGAN</p>
 
         <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="username">Username PIC</label>
+            <div class="form-group" id="groupUser">
+                <label for="username">USERNAME PIC</label>
                 <input 
                     type="text" 
                     id="username" 
-                    placeholder="Masukkan username..." 
+                    placeholder="MASUKKAN USERNAME..." 
                     required 
                     autocomplete="off"
                     oninput="this.value = this.value.toUpperCase()"
                 >
             </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
+            <div class="form-group" id="groupPass">
+                <label for="password">PASSWORD</label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="Masukkan password..." required>
+                    <input type="password" id="password" placeholder="MASUKKAN PASSWORD..." required>
                     <button type="button" class="toggle-password-btn" id="togglePasswordBtn" aria-label="Tampilkan password">🙉</button>
                 </div>
-                <div id="capslockWarning" class="capslock-warning" aria-live="polite">⚠️ Caps Lock aktif</div>
+                <div id="capslockWarning" class="capslock-warning" aria-live="polite">⚠️ Caps Lock Aktif</div>
             </div>
 
             <button type="submit" class="btn-login" id="btnLogin">MASUK SEKARANG 🚀</button>
             <div id="errorMsg" class="error-msg">Username atau Password salah!</div>
         </form>
 
-        <div class="server-status-box">
+        <div class="server-status-box" id="statusBox">
             <div class="status-info">
                 <span id="statusDot" class="status-dot"></span>
                 <span id="statusText" style="color: #94a3b8;">Mengecek Server...</span>
@@ -249,11 +62,9 @@
     </div>
 
     <script>
-        // URL GOOGLE APPS SCRIPT
         const CASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0Kd5FEaK0lFx1A5TdNfyCqtYH_GZgeKbGy9vuNi2S-WouNgDmWF7kFDmX06y3IwW_Sw/exec";
-        let SERVER_URL = "http://localhost:5000"; // Fallback default
+        let SERVER_URL = "http://localhost:5000";
 
-        // AMBIL DYNAMIC SERVER URL DARI GSHEET CONFIG
         async function initServerUrl() {
             try {
                 const res = await fetch(`${CASE_SCRIPT_URL}?action=get_server_url`);
@@ -267,7 +78,6 @@
             }
         }
 
-        // 1. FUNGSI CEK KONEKSI SERVER
         async function checkServerStatus() {
             const dot = document.getElementById("statusDot");
             const text = document.getElementById("statusText");
@@ -290,7 +100,7 @@
                 if (res.ok) {
                     dot.className = "status-dot online";
                     text.innerText = "Server Online 🟢";
-                    text.style.color = "#22c55e";
+                    text.style.color = "#00ff66";
                 } else {
                     throw new Error("Server Error");
                 }
@@ -303,7 +113,6 @@
             }
         }
 
-        // FUNGSI TOGGLE PASSWORD (MENGGUNAKAN 🙉 DAN 🙈)
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById("password");
             const toggleBtn = document.getElementById("togglePasswordBtn");
@@ -322,7 +131,6 @@
             warning.classList.toggle("show", isCapsOn);
         }
 
-        // 2. FUNGSI HANDLE LOGIN VIA API SERVER LOKAL
         async function handleLogin(event) {
             event.preventDefault();
             
@@ -331,8 +139,15 @@
             const errorMsg = document.getElementById("errorMsg");
             const btnLogin = document.getElementById("btnLogin");
 
+            const loginCard = document.getElementById("loginCard");
+            const loginTitle = document.getElementById("loginTitle");
+            const loginSub = document.getElementById("loginSub");
+            const groupUser = document.getElementById("groupUser");
+            const groupPass = document.getElementById("groupPass");
+            const statusBox = document.getElementById("statusBox");
+
             errorMsg.style.display = "none";
-            btnLogin.innerText = "MEMPROSES...";
+            btnLogin.innerText = "VERIFIKASI SISTEM...";
             btnLogin.disabled = true;
 
             try {
@@ -346,21 +161,32 @@
 
                 if (response.ok && data.success) {
                     sessionStorage.setItem("loggedInUser", user);
-                    window.location.href = "index.html";
+                    
+                    loginCard.classList.add("shatter");
+                    loginTitle.classList.add("scatter-title");
+                    loginSub.classList.add("scatter-title");
+                    groupUser.classList.add("scatter-user");
+                    groupPass.classList.add("scatter-pass");
+                    btnLogin.classList.add("scatter-btn");
+                    statusBox.classList.add("scatter-status");
+                    
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1700);
                 } else {
                     errorMsg.innerText = data.message || "Username atau Password salah!";
                     errorMsg.style.display = "block";
+                    btnLogin.innerText = "MASUK SEKARANG 🚀";
+                    btnLogin.disabled = false;
                 }
             } catch (err) {
                 errorMsg.innerText = "Gagal terhubung ke Server Laptop!";
                 errorMsg.style.display = "block";
-            } finally {
                 btnLogin.innerText = "MASUK SEKARANG 🚀";
                 btnLogin.disabled = false;
             }
         }
 
-        // INITIALIZATION
         document.addEventListener("DOMContentLoaded", async () => {
             const passwordInput = document.getElementById("password");
             const toggleBtn = document.getElementById("togglePasswordBtn");
@@ -371,8 +197,8 @@
             passwordInput.addEventListener("keyup", updateCapsLockWarning);
             passwordInput.addEventListener("blur", () => warning.classList.remove("show"));
 
-            await initServerUrl(); // Ambil URL aktif dari GSheet dulu
-            checkServerStatus();   // Baru cek koneksi server
+            await initServerUrl(); 
+            checkServerStatus();   
 
             if (sessionStorage.getItem("loggedInUser")) {
                 window.location.href = "index.html";
