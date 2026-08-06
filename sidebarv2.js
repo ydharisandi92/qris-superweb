@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // 1. INJEKSI CSS STYLING SIDEBAR
+    // 1. INJEKSI CSS STYLING SIDEBAR (CYBER GLASSMORPHISM EDITION)
     const styleID = "dynamic-sidebar-style";
     if (!document.getElementById(styleID)) {
         const styleElement = document.createElement("style");
@@ -50,14 +50,15 @@ document.addEventListener("DOMContentLoaded", async function () {
           padding-bottom: 50px !important;
       }
       .sidebar-brand {
-          font-size: 14px !important;
-          font-weight: 700 !important;
+          font-size: 15px !important;
+          font-weight: 900 !important;
           color: #ffffff !important;
-          letter-spacing: 0.5px;
+          letter-spacing: 2px;
           padding: 0 12px 14px 12px;
-          margin-bottom: 6px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          margin-bottom: 8px;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.25);
           white-space: nowrap;
+          text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
       }
       .nav-menu {
           display: flex;
@@ -68,27 +69,29 @@ document.addEventListener("DOMContentLoaded", async function () {
           padding: 9px 12px;
           border-radius: 8px;
           font-size: 11.5px;
-          font-weight: 600;
+          font-weight: 700;
           text-decoration: none;
           color: #94a3b8;
           background: transparent;
           border: 1px solid transparent;
-          transition: all 0.2s ease-in-out;
+          transition: all 0.25s ease;
           display: flex;
           align-items: center;
           gap: 10px;
           white-space: nowrap;
       }
       .nav-item:hover {
-          background: rgba(30, 41, 59, 0.5);
-          color: #f8fafc;
-          border-color: rgba(71, 85, 105, 0.4);
+          background: rgba(0, 240, 255, 0.1);
+          color: #ffffff;
+          border-color: rgba(0, 240, 255, 0.3);
+          box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
       }
       .nav-item.active {
-          background: rgba(30, 41, 59, 0.8) !important;
-          color: #ffffff !important;
-          border-color: rgba(71, 85, 105, 0.6) !important;
-          font-weight: 700;
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(13, 89, 184, 0.25) 100%) !important;
+          color: #00f0ff !important;
+          border: 1px solid rgba(0, 240, 255, 0.5) !important;
+          font-weight: 800;
+          box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
       }
 
       /* DROPDOWN MENU STYLING */
@@ -97,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           padding: 9px 12px;
           border-radius: 8px;
           font-size: 11.5px;
-          font-weight: 700;
+          font-weight: 800;
           color: #cbd5e1;
           background: transparent;
           border: 1px solid transparent;
@@ -105,19 +108,23 @@ document.addEventListener("DOMContentLoaded", async function () {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          transition: all 0.2s ease-in-out;
+          transition: all 0.25s ease;
           text-transform: uppercase;
+          letter-spacing: 0.5px;
       }
       .dropdown-btn:hover {
-          background: rgba(30, 41, 59, 0.5);
-          color: #f8fafc;
-          border-color: rgba(71, 85, 105, 0.4);
+          background: rgba(0, 240, 255, 0.1);
+          color: #ffffff;
+          border-color: rgba(0, 240, 255, 0.3);
       }
-      .dropdown-btn.active { color: #fbbf24; }
+      .dropdown-btn.active { 
+          color: #00f0ff; 
+          text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+      }
       .dropdown-container {
           display: none; flex-direction: column; gap: 3px;
           padding-left: 10px; margin-top: 2px; margin-bottom: 4px;
-          border-left: 2px solid rgba(255, 255, 255, 0.1); margin-left: 10px;
+          border-left: 2px solid rgba(0, 240, 255, 0.25); margin-left: 10px;
       }
       .dropdown-container.show { display: flex; }
       .dropdown-arrow { font-size: 9px; transition: transform 0.2s ease; }
@@ -127,23 +134,26 @@ document.addEventListener("DOMContentLoaded", async function () {
       .sidebar-pic-box {
           margin-top: auto !important;
           margin-bottom: 8px;
-          padding: 8px 10px;
-          background: rgba(15, 23, 42, 0.75);
-          border: 1px solid rgba(251, 191, 36, 0.3);
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          padding: 10px 12px;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(15, 23, 42, 0.6) 100%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(0, 240, 255, 0.3);
+          border-radius: 10px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.4);
       }
       .sidebar-pic-title {
           font-size: 9.5px;
           font-weight: 800;
-          color: #fbbf24;
+          color: #00f0ff;
           display: flex;
           align-items: center;
           gap: 6px;
-          margin-bottom: 4px;
+          margin-bottom: 6px;
           text-transform: uppercase;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          padding-bottom: 3px;
+          letter-spacing: 1px;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+          padding-bottom: 4px;
       }
       .sidebar-pic-value {
           font-size: 10.5px;
@@ -151,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           color: #f8fafc;
           display: flex;
           flex-direction: column;
-          gap: 3px;
+          gap: 4px;
       }
 
       .sidebar-footer {
@@ -173,38 +183,44 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       .btn-action {
           flex: 1;
-          padding: 7px 4px; 
+          padding: 8px 4px; 
           border-radius: 6px;
           font-size: 10px; 
-          font-weight: 700; 
-          border: none; 
+          font-weight: 800; 
+          border: 1px solid rgba(0, 240, 255, 0.3); 
           cursor: pointer;
           white-space: nowrap; 
-          transition: background 0.2s ease;
+          transition: all 0.25s ease;
           display: flex; 
           align-items: center; 
           justify-content: center; 
           gap: 4px;
+          letter-spacing: 0.5px;
       }
-      .btn-chpass { background: #334155; color: #f8fafc; border: 1px solid #475569; }
-      .btn-chpass:hover { background: #475569; }
-      .btn-logout { background: #ef4444; color: #ffffff; }
-      .btn-logout:hover { background: #dc2626; }
+      .btn-chpass { background: rgba(15, 23, 42, 0.7); color: #f8fafc; }
+      .btn-chpass:hover { background: rgba(0, 240, 255, 0.2); border-color: #00f0ff; color: #00f0ff; }
+      .btn-logout { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); color: #ef4444; }
+      .btn-logout:hover { background: #dc2626; color: #ffffff; border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
 
+      /* MODAL GLASSMORPHISM */
       .modal-overlay {
           position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-          background: rgba(0,0,0,0.7); display: none;
+          background: rgba(5, 11, 20, 0.85); backdrop-filter: blur(10px); display: none;
           align-items: center; justify-content: center; z-index: 9999;
       }
       .modal-box {
-          background: #1e293b; border: 1px solid #334155; border-radius: 12px;
-          padding: 24px; width: 320px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(15, 23, 42, 0.85) 100%);
+          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(0, 240, 255, 0.35); border-top: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 16px; padding: 24px; width: 320px; color: #fff;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 20px rgba(0, 240, 255, 0.15);
       }
-      .modal-box h3 { margin: 0 0 16px 0; font-size: 15px; color: #fbbf24; }
-      .modal-box label { display: block; font-size: 11px; margin-bottom: 4px; color: #94a3b8; text-align: left; }
-      .modal-box input { width: 100%; padding: 8px; margin-bottom: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; font-size: 12px; box-sizing: border-box; }
+      .modal-box h3 { margin: 0 0 16px 0; font-size: 15px; color: #00f0ff; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+      .modal-box label { display: block; font-size: 10px; font-weight: 800; margin-bottom: 4px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
+      .modal-box input { width: 100%; padding: 10px; margin-bottom: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 8px; color: #fff; font-size: 12px; outline: none; box-sizing: border-box; transition: all 0.25s ease; }
+      .modal-box input:focus { border-color: #00f0ff; box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
       .modal-btns { display: flex; gap: 8px; margin-top: 8px; }
-      .modal-btn { flex: 1; padding: 8px; border-radius: 6px; font-weight: 700; border: none; cursor: pointer; font-size: 12px; }
+      .modal-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 800; border: none; cursor: pointer; font-size: 12px; letter-spacing: 0.5px; transition: all 0.25s ease; }
     `;
         document.head.appendChild(styleElement);
     }
@@ -245,7 +261,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     <!-- WIDGET PIC ON DUTY BAWAH -->
     <div class="sidebar-pic-box">
         <div class="sidebar-pic-title">
-            <span style="height:6px; width:6px; background:#10b981; border-radius:50%; display:inline-block;"></span>
+            <span style="height:6px; width:6px; background:#00ff66; border-radius:50%; display:inline-block; box-shadow:0 0 8px #00ff66;"></span>
             <span>PIC ON DUTY</span>
         </div>
         <div id="sidebarPicDutyText" class="sidebar-pic-value">
@@ -272,8 +288,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <input type="password" id="newPass" required placeholder="Masukkan pass baru...">
                 <div id="passMsg" style="font-size: 11px; margin-bottom: 10px; display: none;"></div>
                 <div class="modal-btns">
-                    <button type="button" onclick="closeChangePassModal()" class="modal-btn" style="background:#475569; color:#fff;">Batal</button>
-                    <button type="submit" class="modal-btn" style="background:#1565c0; color:#fff;">Simpan</button>
+                    <button type="button" onclick="closeChangePassModal()" class="modal-btn" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);">Batal</button>
+                    <button type="submit" class="modal-btn" style="background:linear-gradient(135deg, #0d59b8 0%, #0099ff 100%); color:#fff; border:1px solid rgba(0,240,255,0.5);">Simpan</button>
                 </div>
             </form>
         </div>
@@ -332,15 +348,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;">
                     <span id="bottom-realtime-date" style="color: #94a3b8;">-</span>
-                    <span style="color: #334155;">|</span>
-                    <span id="bottom-realtime-clock" style="color: #fbbf24;">-</span>
+                    <span style="color: rgba(0,240,255,0.3);">|</span>
+                    <span id="bottom-realtime-clock" style="color: #00f0ff;">-</span>
                 </div>
             </div>
         `;
         document.body.insertAdjacentHTML("beforeend", bottomBarHTML);
     }
 
-    // 5. AUTO INJEK NAMA USER LOGGED IN KE INPUT PIC LAPORAN (PENTING!)
+    // 5. AUTO INJEK NAMA USER LOGGED IN KE INPUT PIC LAPORAN
     function autoInjectPicName() {
         const picElement = document.getElementById("pic");
         if (picElement && currentUser && currentUser !== "GUEST") {
@@ -399,9 +415,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (activeDuty.length > 0) {
             picEl.innerHTML = activeDuty.map(item => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:1px 0; border-bottom:1px dashed rgba(255,255,255,0.08);">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 0; border-bottom:1px dashed rgba(0,240,255,0.15);">
                     <span style="font-weight:700; color:#f8fafc; font-size:10px;">${item.nama}</span>
-                    <span style="font-size:9px; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.12); padding:1px 4px; border-radius:3px; margin-left:4px;">${item.shift}</span>
+                    <span style="font-size:9px; font-weight:800; color:#00f0ff; background:rgba(0,240,255,0.12); padding:1px 4px; border-radius:3px; margin-left:4px;">${item.shift}</span>
                 </div>
             `).join('');
         } else {
@@ -524,7 +540,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // INITIALIZATION
     autoInjectPicName();
-    setTimeout(autoInjectPicName, 300); // Retry delay untuk memastikan input #pic di HTML siap
+    setTimeout(autoInjectPicName, 300);
     
     loadInstantlyFromCache();
     await initServerUrl(); 
@@ -563,7 +579,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const msgEl = document.getElementById("passMsg");
 
         msgEl.innerText = "Memproses...";
-        msgEl.style.color = "#fbbf24";
+        msgEl.style.color = "#00f0ff";
         msgEl.style.display = "block";
 
         try {
@@ -580,7 +596,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const data = await res.json();
             if (res.ok && data.success) {
                 msgEl.innerText = "✅ " + data.message;
-                msgEl.style.color = "#22c55e";
+                msgEl.style.color = "#00ff66";
                 setTimeout(() => closeChangePassModal(), 1500);
             } else {
                 msgEl.innerText = "❌ " + (data.message || "Gagal mengubah password");
