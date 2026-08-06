@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     let rawSchedules = [];
     let directPicString = "";
-    let lastFetchedDate = null;
+    let lastFetchedOpDate = null;
 
     const SHIFT_HOURS = {
         'CSHP':  { start: '06:00', end: '14:00' },
@@ -21,6 +21,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         'CSS':   { start: '14:30', end: '21:00' },
         'CSF':   { start: '08:00', end: '21:00' }
     };
+
+    // FUNGSI MENGHITUNG TANGGAL OPERASIONAL SHIFT
+    function getOperationalDateStr(now = new Date()) {
+        const d = new Date(now);
+        // Jika jam antara 00:00 - 05:59 WIB, jadwal shift malam masih merujuk ke H-1 (hari kemarin)
+        if (d.getHours() < 6) {
+            d.setDate(d.getDate() - 1);
+        }
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
 
     async function initServerUrl() {
         try {
@@ -442,7 +455,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function fetchSidebarJadwalDuty() {
         try {
-            const response = await fetch(`${SCHEDULE_SCRIPT_URL}?cacheBust=${Date.now()}`, {
+            const now = new Date();
+            const opDateStr = getOperationalDateStr(now);
+
+            // Mengirim tanggal operasional (H-1 jika 00:00 - 05:59)
+            const response = await fetch(`${SCHEDULE_SCRIPT_URL}?date=${opDateStr}&cacheBust=${Date.now()}`, {
                 method: 'GET',
                 redirect: 'follow'
             });
@@ -460,7 +477,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             renderSidebarPicDuty();
-            lastFetchedDate = new Date().getDate();
+            lastFetchedOpDate = opDateStr;
 
         } catch (err) {
             console.error("❌ Gagal memperbarui jadwal sidebar:", err);
@@ -485,7 +502,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         renderSidebarPicDuty();
 
-        if (lastFetchedDate !== null && now.getDate() !== lastFetchedDate) {
+        // Mengecek apakah sudah masuk tanggal operasional berikutnya
+        const currentOpDate = getOperationalDateStr(now);
+        if (lastFetchedOpDate !== null && currentOpDate !== lastFetchedOpDate) {
             fetchSidebarJadwalDuty();
         }
     }
