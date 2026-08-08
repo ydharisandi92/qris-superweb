@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOOMSDAY | WA-BOT</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Judul Halaman Utama Lebih Besar */
+        .main-title {
+            font-size: 28px !important;
+            margin-bottom: 20px !important;
+            letter-spacing: 1.5px;
+        }
+
+        /* Panel & Kartu Dibuat LEBIH LEBAR (WIDE) */
+        .wabot-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0 40px;
+            width: 100%;
+        }
+
+        .wabot-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(15, 23, 42, 0.65) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-top: 3px solid var(--neon-cyan);
+            border-radius: 16px;
+            padding: 40px 36px;
+            max-width: 950px; /* Dibuat Wide / Melebar */
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 22px;
+        }
+
+        /* Ukuran Gambar Disesuaikan */
+        .wabot-image {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        /* Judul Fitur Lebih Besar */
+        .wabot-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            margin: 5px 0 0 0;
+        }
+
+        /* Kotak Pengumuman WIDE & Teks Lebih Besar */
+        .wabot-note {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1.5px dashed var(--accent-gold);
+            padding: 18px 28px;
+            border-radius: 12px;
+            color: #fef08a;
+            font-size: 16px; /* Ukuran teks pengumuman diperbesar */
+            font-weight: 700;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%; /* Memenuhi lebar kartu (Wide) */
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
+        }
+
+        .wabot-note-icon {
+            font-size: 20px;
+        }
+
+        /* Tombol Lebih Besar & Nyaman Diklik */
+        .wabot-actions {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .wabot-actions .generate {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-container">
+        <div class="sidebar"></div>
+
+        <div class="main-content">
+            <div class="wrapper">
+                <!-- Judul Halaman Utama -->
+                <h1 class="main-title">WA-BOT SYSTEM</h1>
+
+                <!-- Konten Utama Wide Layout -->
+                <section class="wabot-panel">
+                    <div class="wabot-card">
+                        <img class="wabot-image" src="under-construction.png" alt="Under Construction">
+
+                        <h2 class="wabot-title">FITUR WA-BOT DALAM PEMBUATAN</h2>
+
+                        <!-- Pengumuman Wide Box -->
+                        <div class="wabot-note">
+                            <span class="wabot-note-icon">💡</span>
+                            <span>Kalau Pingin cepet minimal nyumbang kopi atau Es teh sama gorengan</span>
+                        </div>
+
+                        <div class="wabot-actions">
+                            <a href="index.html" class="generate">← Kembali ke Beranda</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="sidebarv2.js"></script>
+</body>
+</html>

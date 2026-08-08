@@ -269,6 +269,17 @@ document.addEventListener("DOMContentLoaded", async function () {
           <a href="validasipulsa.html" class="nav-item" data-page="validasipulsa.html">📱 VALIDASI PULSA</a>
         </div>
       </div>
+
+      <!-- DROPLIST 3: WA-BOT -->
+      <div class="nav-dropdown">
+        <button type="button" class="dropdown-btn" onclick="toggleDropdown('wabotDropdown')">
+          <span>🤖 WA-BOT</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div id="wabotDropdown" class="dropdown-container">
+          <a href="wabot.html" class="nav-item" data-page="wabot.html">🚧 STATUS &amp; SETTING</a>
+        </div>
+      </div>
     </div>
 
     <!-- WIDGET PIC ON DUTY BAWAH -->
